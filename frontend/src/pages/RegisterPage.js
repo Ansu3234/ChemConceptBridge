@@ -1,0 +1,179 @@
+
+import React, { useState } from "react";
+import axios from "axios";
+import { useNavigate, Link } from "react-router-dom";
+import "./RegisterPage.css";
+
+function RegisterPage() {
+  const navigate = useNavigate();
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [touched, setTouched] = useState({ name: false, email: false, password: false, confirmPassword: false });
+  const [emailExists, setEmailExists] = useState(false);
+
+  // Validation functions
+  const validateName = (value) => {
+    if (!value) return "Name is required";
+    return "";
+  };
+  const validateEmail = (value) => {
+    if (!value) return "Email is required";
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(value)) return "Invalid email address";
+    if (emailExists) return "Email already exists";
+    return "";
+  };
+
+  // Check if email exists on blur only
+  const handleEmailChange = (e) => {
+    const value = e.target.value;
+    setEmail(value);
+    setTouched(t => ({ ...t, email: true }));
+    setEmailExists(false);
+  };
+
+  const handleEmailBlur = async () => {
+    setTouched(t => ({ ...t, email: true }));
+    if (/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
+      try {
+        const res = await axios.post("http://localhost:5000/api/auth/check-email", { email });
+        setEmailExists(res.data.exists);
+      } catch (err) {
+        setEmailExists(false);
+      }
+    }
+  };
+  const validatePassword = (value) => {
+    if (!value) return "Password is required";
+    if (value.length < 6) return "Password must be at least 6 characters";
+    return "";
+  };
+  const validateConfirmPassword = (value) => {
+    if (!value) return "Please confirm your password";
+    if (value !== password) return "Passwords do not match";
+    return "";
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setTouched({ name: true, email: true, password: true, confirmPassword: true });
+    setError("");
+    const nameError = validateName(name);
+    const emailError = validateEmail(email);
+    const passwordError = validatePassword(password);
+    const confirmPasswordError = validateConfirmPassword(confirmPassword);
+    if (nameError || emailError || passwordError || confirmPasswordError) {
+      setError(nameError || emailError || passwordError || confirmPasswordError);
+      return;
+    }
+    setLoading(true);
+    try {
+      await axios.post("http://localhost:5000/api/auth/register", { name, email, password });
+      // Auto-login
+      const loginRes = await axios.post("http://localhost:5000/api/auth/login", { email, password });
+      const token = loginRes.data.token;
+      localStorage.setItem("token", token);
+      navigate("/dashboard");
+    } catch (err) {
+      setError(err.response?.data?.message || "Something went wrong");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="register-container">
+      <div className="register-card">
+        <div className="chem-header">
+          <img src="https://cdn-icons-png.flaticon.com/512/2553/2553635.png" alt="colorful-chemistry-logo" className="chem-logo" />
+          <h2>ChemConcept Bridge</h2>
+          <p className="chem-subtext">Join our community of chemistry learners</p>
+        </div>
+        <form onSubmit={handleSubmit}>
+          <div className="form-group">
+            <label htmlFor="name">Full Name</label>
+            <input
+              id="name"
+              name="name"
+              type="text"
+              placeholder="Enter your full name"
+              value={name}
+              onChange={e => setName(e.target.value)}
+              onBlur={() => setTouched(t => ({ ...t, name: true }))}
+              className={touched.name && validateName(name) ? 'input-error' : ''}
+            />
+            {touched.name && validateName(name) && <p className="error-message">{validateName(name)}</p>}
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="email">Email Address</label>
+            <input
+              id="email"
+              name="email"
+              type="email"
+              placeholder="Enter your email address"
+              value={email}
+              onChange={handleEmailChange}
+              onBlur={handleEmailBlur}
+              className={touched.email && validateEmail(email) ? 'input-error' : ''}
+              autoComplete="email"
+            />
+            {touched.email && validateEmail(email) && <p className="error-message">{validateEmail(email)}</p>}
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="password">Password</label>
+            <input
+              id="password"
+              name="password"
+              type="password"
+              placeholder="Create a secure password"
+              value={password}
+              onChange={e => setPassword(e.target.value)}
+              onBlur={() => setTouched(t => ({ ...t, password: true }))}
+              className={touched.password && validatePassword(password) ? 'input-error' : ''}
+              autoComplete="new-password"
+            />
+            {touched.password && validatePassword(password) && <p className="error-message">{validatePassword(password)}</p>}
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="confirmPassword">Confirm Password</label>
+            <input
+              id="confirmPassword"
+              name="confirmPassword"
+              type="password"
+              placeholder="Re-enter your password"
+              value={confirmPassword}
+              onChange={e => setConfirmPassword(e.target.value)}
+              onBlur={() => setTouched(t => ({ ...t, confirmPassword: true }))}
+              className={touched.confirmPassword && validateConfirmPassword(confirmPassword) ? 'input-error' : ''}
+              autoComplete="new-password"
+            />
+            {touched.confirmPassword && validateConfirmPassword(confirmPassword) && <p className="error-message">{validateConfirmPassword(confirmPassword)}</p>}
+          </div>
+
+          {error && <p className="error-message" style={{ marginTop: 10 }}>{error}</p>}
+
+          <button
+            type="submit"
+            className="register-btn"
+            disabled={loading}
+          >
+            {loading ? 'Registering...' : 'Create Account'}
+          </button>
+          <div className="divider"><span>OR</span></div>
+          <div className="login-links">
+            <p>Already have an account? <Link to="/login">Sign In</Link></p>
+            <Link to="/generate-password">Need help creating a secure password?</Link>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+
+export default RegisterPage;

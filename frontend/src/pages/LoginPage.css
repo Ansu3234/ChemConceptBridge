@@ -1,0 +1,336 @@
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: 
+    linear-gradient(to right, rgba(245, 245, 245, 0.9), rgba(240, 240, 240, 0.9)),
+    url('https://www.transparenttextures.com/patterns/cubes.png');
+  background-repeat: repeat;
+  height: 100vh;
+  font-family: 'Georgia', 'Times New Roman', serif;
+  padding: 20px;
+  position: relative;
+  overflow: hidden;
+  animation: gradientBG 15s ease infinite;
+}
+
+@keyframes gradientBG {
+  0% {
+    background-color: rgba(144, 224, 239, 0.2);
+  }
+  25% {
+    background-color: rgba(202, 240, 248, 0.2);
+  }
+  50% {
+    background-color: rgba(173, 232, 244, 0.2);
+  }
+  75% {
+    background-color: rgba(202, 240, 248, 0.2);
+  }
+  100% {
+    background-color: rgba(144, 224, 239, 0.2);
+  }
+}
+
+.login-card {
+  background: linear-gradient(135deg, #ffffff, #f0f8ff);
+  padding: 40px 35px;
+  border-radius: 12px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+  width: 100%;
+  max-width: 420px;
+  border: 1px solid #e0e0e0;
+  position: relative;
+  overflow: hidden;
+}
+
+.login-card::before {
+  content: '';
+  position: absolute;
+  top: -50px;
+  left: -50px;
+  right: -50px;
+  bottom: -50px;
+  background: linear-gradient(45deg, rgba(72, 202, 228, 0.1), rgba(173, 216, 230, 0.1), rgba(144, 224, 239, 0.1));
+  z-index: -1;
+  animation: shimmer 8s infinite linear;
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-50%) translateY(-50%) rotate(0deg); }
+  100% { transform: translateX(-50%) translateY(-50%) rotate(360deg); }
+}
+
+/* Chemistry Themed Header */
+.chem-header {
+  text-align: center;
+  margin-bottom: 30px;
+  border-bottom: 1px solid #e0e0e0;
+  padding-bottom: 20px;
+}
+
+.chem-logo {
+  width: 70px;
+  height: 70px;
+  margin-bottom: 10px;
+}
+
+.chem-header h2 {
+  font-size: 28px;
+  background: linear-gradient(90deg, #0077b6, #00b4d8, #48cae4);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  margin: 5px 0;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-shadow: 0px 2px 2px rgba(0, 0, 0, 0.1);
+}
+
+.chem-subtext {
+  font-size: 15px;
+  color: #5d6d7e;
+  margin-top: 5px;
+  font-style: italic;
+}
+
+.login-toggle {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 25px;
+}
+
+.login-toggle button {
+  padding: 10px 25px;
+  border: 2px solid #00b4d8;
+  background-color: white;
+  color: #0077b6;
+  cursor: pointer;
+  margin: 0 5px;
+  border-radius: 4px;
+  transition: 0.3s;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 10px rgba(0, 180, 216, 0.15);
+}
+
+.login-toggle .active {
+  background: linear-gradient(90deg, #0077b6, #00b4d8);
+  color: white;
+  border: 2px solid transparent;
+}
+
+label {
+  display: block;
+  margin-top: 18px;
+  font-weight: 500;
+  color: #2c3e50;
+  margin-bottom: 6px;
+}
+
+input[type="email"],
+input[type="tel"],
+input[type="password"],
+input[type="text"],
+select {
+  width: 100%;
+  padding: 12px;
+  margin-top: 5px;
+  border: 1px solid #bdc3c7;
+  border-radius: 4px;
+  box-sizing: border-box;
+  font-family: 'Georgia', 'Times New Roman', serif;
+  font-size: 15px;
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+input[type="email"]:focus,
+input[type="tel"]:focus,
+input[type="password"]:focus,
+input[type="text"]:focus,
+select:focus {
+  outline: none;
+  border-color: #34495e;
+  box-shadow: 0 0 0 2px rgba(52, 73, 94, 0.2);
+}
+
+.otp-checkbox {
+  margin-top: 10px;
+}
+
+.login-options {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 15px 0;
+}
+
+.forgot-link {
+  color: #34495e;
+  font-size: 14px;
+  text-decoration: none;
+  transition: color 0.3s;
+}
+
+.forgot-link:hover {
+  color: #2c3e50;
+  text-decoration: underline;
+}
+
+.login-options label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin: 0;
+  font-weight: normal;
+  cursor: pointer;
+}
+
+.login-options input[type="checkbox"] {
+  margin: 0;
+  cursor: pointer;
+}
+
+.login-btn {
+  background: linear-gradient(90deg, #0077b6, #00b4d8);
+  color: white;
+  width: 100%;
+  padding: 14px;
+  margin-top: 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: all 0.3s ease;
+  letter-spacing: 0.5px;
+  font-size: 16px;
+  text-transform: uppercase;
+  box-shadow: 0 4px 15px rgba(0, 119, 182, 0.3);
+}
+
+.login-btn:hover {
+  background: linear-gradient(90deg, #00b4d8, #0077b6);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 119, 182, 0.4);
+}
+
+.login-btn:disabled {
+  background-color: #95a5a6;
+  cursor: not-allowed;
+}
+
+.divider {
+  text-align: center;
+  margin: 25px 0;
+  font-weight: 500;
+  color: #7f8c8d;
+  position: relative;
+}
+
+.divider span {
+  background-color: #fff;
+  padding: 0 15px;
+  position: relative;
+  z-index: 1;
+  font-size: 14px;
+}
+
+.divider::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  border-top: 1px solid #e0e0e0;
+  z-index: 0;
+}
+
+.google-btn {
+  background-color: #ffffff;
+  border: 1px solid #bdc3c7;
+  width: 100%;
+  padding: 12px;
+  margin-top: 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  color: #34495e;
+  font-weight: 500;
+  transition: 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.google-btn:hover {
+  background-color: #f8f9fa;
+  border-color: #95a5a6;
+}
+
+.google-btn::before {
+  content: 'G';
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  background-color: #4285F4;
+  color: white;
+  border-radius: 50%;
+  text-align: center;
+  line-height: 20px;
+  font-weight: bold;
+}
+
+.register-links {
+  text-align: center;
+  margin-top: 25px;
+  font-size: 15px;
+  color: #7f8c8d;
+  border-top: 1px solid #e0e0e0;
+  padding-top: 20px;
+}
+
+.register-links a {
+  color: #34495e;
+  margin: 0 4px;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.3s;
+}
+
+.register-links a:hover {
+  color: #2c3e50;
+  text-decoration: underline;
+}
+
+/* User Type Selector */
+.user-type-selector {
+  margin-top: 20px;
+}
+
+.user-type-selector select {
+  background-color: white;
+  cursor: pointer;
+}
+
+/* Responsive */
+@media screen and (max-width: 480px) {
+  .login-card {
+    padding: 25px;
+    width: 100%;
+  }
+
+  .login-toggle button {
+    padding: 8px 16px;
+    font-size: 14px;
+  }
+
+  .login-btn,
+  .google-btn {
+    font-size: 15px;
+    padding: 12px 0;
+  }
+  
+  .chem-header h2 {
+    font-size: 24px;
+  }
+}

@@ -1,0 +1,169 @@
+.concept-pages {
+  display: flex;
+  gap: 24px;
+  height: calc(100vh - 200px);
+  overflow: hidden;
+}
+
+.concept-sidebar {
+  width: 300px;
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e2e8f0;
+  overflow-y: auto;
+}
+
+.concept-sidebar h3 {
+  margin: 0 0 20px 0;
+  color: #1e293b;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.concept-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.concept-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 1px solid #e2e8f0;
+  background: #f8fafc;
+}
+
+.concept-item:hover {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+  transform: translateX(4px);
+}
+
+.concept-item.active {
+  background: linear-gradient(135deg, #dbeafe, #e0f2fe);
+  border-color: #3b82f6;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.2);
+}
+
+.concept-icon {
+  font-size: 24px;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.concept-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.concept-title {
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 4px;
+  font-size: 14px;
+}
+
+.concept-description {
+  color: #64748b;
+  font-size: 12px;
+  line-height: 1.4;
+  margin-bottom: 8px;
+}
+
+.concept-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+}
+
+.difficulty-badge {
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.time-estimate {
+  color: #94a3b8;
+  background: #f1f5f9;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.concept-content {
+  flex: 1;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e2e8f0;
+  overflow-y: auto;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .concept-pages {
+    flex-direction: column;
+    height: auto;
+  }
+  
+  .concept-sidebar {
+    width: 100%;
+    max-height: 200px;
+  }
+  
+  .concept-content {
+    min-height: 500px;
+  }
+}
+
+@media (max-width: 768px) {
+  .concept-sidebar {
+    padding: 16px;
+  }
+  
+  .concept-item {
+    padding: 12px;
+  }
+  
+  .concept-icon {
+    width: 32px;
+    height: 32px;
+    font-size: 20px;
+  }
+}
+
+/* Scrollbar Styling */
+.concept-sidebar::-webkit-scrollbar,
+.concept-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.concept-sidebar::-webkit-scrollbar-track,
+.concept-content::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 3px;
+}
+
+.concept-sidebar::-webkit-scrollbar-thumb,
+.concept-content::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+
+.concept-sidebar::-webkit-scrollbar-thumb:hover,
+.concept-content::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}

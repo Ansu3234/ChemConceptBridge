@@ -1,0 +1,118 @@
+.gamified-tracker {
+  max-width: 700px;
+  margin: 32px auto;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+  padding: 32px 24px 24px 24px;
+  font-family: 'Segoe UI', Arial, sans-serif;
+}
+.gt-header h2 {
+  font-size: 2rem;
+  color: #1e293b;
+  margin-bottom: 0.25em;
+  font-weight: 700;
+}
+.gt-header p {
+  color: #64748b;
+  margin-bottom: 1.5em;
+}
+.gt-flex {
+  display: flex;
+  gap: 32px;
+  flex-wrap: wrap;
+}
+.gt-user-card {
+  flex: 1;
+  background: #f1f5f9;
+  border-radius: 12px;
+  padding: 24px 18px;
+  min-width: 220px;
+  box-shadow: 0 2px 8px rgba(30,41,59,0.04);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.gt-xp {
+  font-size: 2.2rem;
+  color: #0e7490;
+  font-weight: 600;
+  margin-bottom: 1em;
+}
+.gt-badges {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.gt-badge {
+  background: #fff;
+  border: 1px solid #e0e7ef;
+  border-radius: 8px;
+  padding: 8px 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 1rem;
+  color: #334155;
+  box-shadow: 0 1px 4px rgba(30,41,59,0.04);
+  transition: box-shadow 0.2s;
+}
+.gt-badge:hover {
+  box-shadow: 0 4px 12px rgba(14,116,144,0.10);
+}
+.gt-badge-icon {
+  font-size: 1.3rem;
+}
+.gt-badge-name {
+  font-weight: 500;
+}
+.gt-leaderboard {
+  flex: 1;
+  min-width: 220px;
+  background: #f8fafc;
+  border-radius: 12px;
+  padding: 24px 18px;
+  box-shadow: 0 2px 8px rgba(30,41,59,0.04);
+}
+.gt-leaderboard h3 {
+  color: #334155;
+  font-size: 1.1rem;
+  margin-bottom: 1em;
+  font-weight: 600;
+}
+.gt-leaderboard ol {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.gt-leaderboard li {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 8px 0;
+  font-size: 1rem;
+  border-bottom: 1px solid #e0e7ef;
+}
+.gt-leaderboard li:last-child {
+  border-bottom: none;
+}
+.gt-me {
+  background: #e0f2fe;
+  border-radius: 6px;
+  font-weight: 600;
+}
+.gt-rank {
+  color: #0ea5e9;
+  font-size: 1.1rem;
+  width: 32px;
+  text-align: center;
+}
+.gt-lb-name {
+  flex: 1;
+  color: #334155;
+}
+.gt-lb-xp {
+  color: #0e7490;
+  font-weight: 500;
+}
