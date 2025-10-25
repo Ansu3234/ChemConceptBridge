@@ -1,14 +1,7 @@
-import React, { useState } from 'react';
+import React from 'react';
 import './Sidebar.css';
-import PerformanceDashboard from '../Progress/PerformanceDashboard';
-import GamifiedTracker from '../Gamification/GamifiedTracker';
-import ConfidenceMeter from '../Progress/ConfidenceMeter';
-import MoleculeAnimation from '../MoleculeAnimation/MoleculeAnimation';
-import PeriodicTable from '../PeriodicTable/PeriodicTable';
 
 const Sidebar = ({ user, activeTab, setActiveTab, onLogout }) => {
-  const [selectedModule, setSelectedModule] = useState('');
-
   const getMenuItems = () => {
     const baseItems = [
       { id: 'overview', label: 'Overview', icon: '📊' },
@@ -22,12 +15,13 @@ const Sidebar = ({ user, activeTab, setActiveTab, onLogout }) => {
         ...baseItems,
         { id: 'concept-map', label: 'Concept Map', icon: '🗺️' },
         { id: 'remediation', label: 'Remediation', icon: '🔧' },
-  { id: 'confidence', label: 'Confidence Meter', icon: '📏' },
-  { id: 'molecule', label: 'Molecule Animation', icon: '⚛️' },
-  { id: 'periodic-table', label: 'Periodic Table', icon: '📅' },
-        { id: 'chemical-equations', label: 'Chemical Equations', icon: '🧮' },
-        { id: 'chemistry-calculator', label: 'Chemistry Calculator', icon: '🧑‍🔬' },
+        { id: 'confidence', label: 'Confidence Meter', icon: '📏' },
+        { id: 'molecule-animation', label: 'Molecule Animation', icon: '⚛️' },
+        { id: 'chemistry-calculator', label: 'Chemistry Calculator', icon: '🧮' },
+        { id: 'periodic-table', label: 'Periodic Table', icon: '📅' },
+        { id: 'chemical-equations', label: 'Chemical Equations', icon: '⚗️' },
         { id: 'leaderboard', label: 'Leaderboard', icon: '🏆' },
+        { id: 'performance-dashboard', label: 'Performance', icon: '📊' },
       ];
     } else if (user.role === 'teacher') {
       return [
@@ -35,13 +29,25 @@ const Sidebar = ({ user, activeTab, setActiveTab, onLogout }) => {
         { id: 'students', label: 'Students', icon: '👥' },
         { id: 'analytics', label: 'Analytics', icon: '📊' },
         { id: 'content', label: 'Content Management', icon: '📚' },
+        { id: 'concept-library', label: 'Concept Library', icon: '🧪' },
+        { id: 'concept-map', label: 'Concept Map', icon: '🗺️' },
+        { id: 'periodic-table', label: 'Periodic Table', icon: '📅' },
+        { id: 'molecule-animation', label: 'Molecule Animation', icon: '⚛️' },
+        { id: 'chemistry-calculator', label: 'Chemistry Calculator', icon: '🧮' },
+        { id: 'chemical-equations', label: 'Chemical Equations', icon: '⚗️' },
+        { id: 'leaderboard', label: 'Leaderboard', icon: '🏆' },
+        { id: 'performance-dashboard', label: 'Performance', icon: '📊' },
       ];
     } else if (user.role === 'admin') {
       return [
         ...baseItems,
         { id: 'users', label: 'User Management', icon: '👥' },
+        { id: 'analytics', label: 'Analytics', icon: '📊' },
+        { id: 'misconceptions', label: 'Misconception Analytics', icon: '🧠' },
         { id: 'system', label: 'System Settings', icon: '⚙️' },
         { id: 'reports', label: 'Reports', icon: '📋' },
+        { id: 'concept-map', label: 'Concept Map', icon: '🗺️' },
+        { id: 'periodic-table', label: 'Periodic Table', icon: '📅' },
       ];
     }
 
@@ -49,11 +55,6 @@ const Sidebar = ({ user, activeTab, setActiveTab, onLogout }) => {
   };
 
   const menuItems = getMenuItems();
-
-  const handleNav = (module) => {
-    setSelectedModule(module);
-    setActiveTab(module);
-  };
 
   return (
     <div className="sidebar">
@@ -86,28 +87,7 @@ const Sidebar = ({ user, activeTab, setActiveTab, onLogout }) => {
               <span className="nav-label">{item.label}</span>
             </button>
           ))}
-          <button
-            className={`nav-item ${activeTab === 'performance' ? 'active' : ''}`}
-            onClick={() => handleNav('performance')}
-          >
-            <span className="nav-icon">📊</span>
-            <span className="nav-label">Performance Dashboard</span>
-          </button>
-          <button
-            className={`nav-item ${activeTab === 'gamified' ? 'active' : ''}`}
-            onClick={() => handleNav('gamified')}
-          >
-            <span className="nav-icon">🎮</span>
-            <span className="nav-label">Gamified Progress</span>
-          </button>
-          {/* Only one nav button for each module, handled by menuItems */}
         </nav>
-
-  {selectedModule === 'performance' && <PerformanceDashboard />}
-  {selectedModule === 'gamified' && <GamifiedTracker />}
-  {selectedModule === 'confidence' && <ConfidenceMeter />}
-  {selectedModule === 'molecule' && <MoleculeAnimation />}
-  {selectedModule === 'periodic-table' && <PeriodicTable />}
       </div>
 
       <div className="sidebar-footer">

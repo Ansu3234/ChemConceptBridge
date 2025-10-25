@@ -4,7 +4,14 @@ import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import Dashboard from './components/Dashboard/Dashboard';
+import ForgotPassword from './pages/ForgotPassword';
+import ResetPassword from './pages/ResetPassword';
+import QuizStatsPage from './pages/QuizStatsPage';
+import StudentProgressPage from './pages/StudentProgressPage';
+import PerformanceDashboard from './components/Progress/PerformanceDashboard';
 import { useState, useEffect } from 'react';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function App() {
   const [userRole, setUserRole] = useState(null);
@@ -42,6 +49,8 @@ function App() {
           return <Navigate to="/teacher-dashboard" replace />;
         } else if (payload.role === 'student') {
           return <Navigate to="/student-dashboard" replace />;
+        } else if (payload.role === 'admin') {
+          return <Navigate to="/admin-dashboard" replace />;
         } else {
           return <Navigate to="/login" replace />;
         }
@@ -60,13 +69,20 @@ function App() {
 
   return (
     <Router>
+      <ToastContainer position="top-right" autoClose={5000} hideProgressBar={false} newestOnTop closeOnClick rtl={false} pauseOnFocusLoss draggable pauseOnHover />
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
-        <Route path="/dashboard" element={<Navigate to={userRole === 'teacher' ? '/teacher-dashboard' : '/student-dashboard'} replace />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password/:token" element={<ResetPassword />} />
+        <Route path="/dashboard" element={<Navigate to={userRole === 'admin' ? '/admin-dashboard' : userRole === 'teacher' ? '/teacher-dashboard' : '/student-dashboard'} replace />} />
+        <Route path="/admin-dashboard" element={<ProtectedRoute element={<Dashboard />} allowedRole="admin" />} />
         <Route path="/teacher-dashboard" element={<ProtectedRoute element={<Dashboard />} allowedRole="teacher" />} />
         <Route path="/student-dashboard" element={<ProtectedRoute element={<Dashboard />} allowedRole="student" />} />
+        <Route path="/quiz/:quizId/stats" element={<ProtectedRoute element={<QuizStatsPage />} allowedRole="teacher" />} />
+        <Route path="/student/:studentId/progress" element={<ProtectedRoute element={<StudentProgressPage />} allowedRole="teacher" />} />
+        <Route path="/performance" element={<PerformanceDashboard />} />
       </Routes>
     </Router>
   );

@@ -1,0 +1,175 @@
+.chemistry-calculator {
+  padding: 20px;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.cc-header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.cc-header h2 {
+  color: #1e40af;
+  margin-bottom: 8px;
+  font-size: 2.5rem;
+}
+
+.cc-header p {
+  color: #6b7280;
+  font-size: 1.1rem;
+}
+
+.calculator-tabs {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 30px;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+.tab {
+  padding: 12px 24px;
+  border: none;
+  background: none;
+  color: #6b7280;
+  font-weight: 600;
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+  transition: all 0.3s ease;
+}
+
+.tab:hover {
+  color: #374151;
+  background: #f9fafb;
+}
+
+.tab.active {
+  color: #1e40af;
+  border-bottom-color: #1e40af;
+  background: #eff6ff;
+}
+
+.calculator-content {
+  background: white;
+  border-radius: 12px;
+  padding: 30px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e5e7eb;
+}
+
+.calculator-section h3 {
+  color: #1e40af;
+  margin-bottom: 8px;
+  font-size: 1.5rem;
+}
+
+.calculator-section p {
+  color: #6b7280;
+  margin-bottom: 25px;
+  line-height: 1.6;
+}
+
+.input-group {
+  margin-bottom: 20px;
+}
+
+.input-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: #374151;
+}
+
+.input-group input,
+.input-group select {
+  width: 100%;
+  padding: 12px 16px;
+  border: 2px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: border-color 0.3s ease;
+}
+
+.input-group input:focus,
+.input-group select:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.button-group {
+  display: flex;
+  gap: 12px;
+  margin-top: 25px;
+}
+
+.calculate-btn,
+.clear-btn {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.calculate-btn {
+  background: #3b82f6;
+  color: white;
+}
+
+.calculate-btn:hover {
+  background: #2563eb;
+}
+
+.clear-btn {
+  background: #f3f4f6;
+  color: #374151;
+  border: 1px solid #d1d5db;
+}
+
+.clear-btn:hover {
+  background: #e5e7eb;
+}
+
+.results {
+  margin-top: 25px;
+  padding: 20px;
+  background: #f0fdf4;
+  border: 1px solid #10b981;
+  border-radius: 8px;
+}
+
+.results div {
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: #065f46;
+}
+
+.results div:last-child {
+  margin-bottom: 0;
+}
+
+@media (max-width: 768px) {
+  .chemistry-calculator {
+    padding: 15px;
+  }
+  
+  .calculator-tabs {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  
+  .tab {
+    padding: 8px 16px;
+    font-size: 0.875rem;
+  }
+  
+  .calculator-content {
+    padding: 20px;
+  }
+  
+  .button-group {
+    flex-direction: column;
+  }
+}

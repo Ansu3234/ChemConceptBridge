@@ -1,0 +1,59 @@
+/* Container */
+.admin-quizzes { padding: 16px; }
+.aq-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; gap: 12px; flex-wrap: wrap; }
+.aq-sub { color: #666; margin-top: 4px; }
+.aq-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.filters { display: flex; align-items: center; gap: 8px; }
+.filter-input, .filter-select { padding: 8px; border-radius: 8px; border: 1px solid #d0d5dd; }
+
+/* Buttons */
+.btn { border: 1px solid #d0d5dd; background: white; padding: 8px 12px; border-radius: 8px; cursor: pointer; text-decoration: none; display: inline-block; }
+.btn.primary { background: #2563eb; border-color: #2563eb; color: white; }
+.btn.danger { background: #ef4444; border-color: #ef4444; color: white; }
+.btn.success { background: #10b981; border-color: #10b981; color: white; }
+.btn.info { background: #6366f1; border-color: #6366f1; color: white; }
+.btn:disabled { opacity: 0.7; cursor: not-allowed; }
+
+/* Form */
+.aq-form { border: 1px solid #e6e9ef; background: #fff; border-radius: 8px; padding: 12px; margin-bottom: 16px; }
+.aq-form .row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+.aq-form .row.end { display: flex; justify-content: flex-end; gap: 8px; }
+.field label { display: block; font-size: 12px; color: #667085; margin-bottom: 6px; }
+.field input, .field select, .field textarea { width: 100%; padding: 8px; border-radius: 8px; border: 1px solid #d0d5dd; }
+
+.questions { margin-top: 12px; }
+.q-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.q-card { border: 1px solid #e6e9ef; border-radius: 8px; padding: 12px; margin-bottom: 12px; }
+.options { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+
+/* Table */
+.aq-table-wrapper { border: 1px solid #e6e9ef; border-radius: 8px; overflow: hidden; background: #fff; }
+.aq-table { width: 100%; border-collapse: collapse; }
+.aq-table th, .aq-table td { padding: 10px 12px; border-bottom: 1px solid #f0f2f5; text-align: left; }
+.aq-table thead th { background: #f8fafc; font-weight: 600; font-size: 14px; color: #334155; }
+.aq-table tbody tr:hover { background: #fafafa; }
+.empty { text-align: center; color: #667085; }
+
+/* Status badges */
+.status-badge {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+  text-transform: capitalize;
+}
+
+.status-badge.active {
+  background-color: #d1fae5;
+  color: #065f46;
+}
+
+.status-badge.inactive {
+  background-color: #fee2e2;
+  color: #991b1b;
+}
+
+/* Loading + alerts */
+.loading { padding: 16px; color: #667085; }
+.aq-alert.error { background: #fee2e2; border: 1px solid #fecaca; color: #991b1b; padding: 10px; border-radius: 8px; margin-bottom: 12px; }

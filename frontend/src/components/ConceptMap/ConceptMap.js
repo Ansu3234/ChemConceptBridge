@@ -1,62 +1,86 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import './ConceptMap.css';
 
-const initialNodes = [
-  { id: 1, label: 'Atomic Structure', x: 120, y: 120 },
-  { id: 2, label: 'Bonding', x: 350, y: 120 },
-  { id: 3, label: 'Acids & Bases', x: 220, y: 300 },
-  { id: 4, label: 'pH', x: 420, y: 300 },
-];
-const initialLinks = [
-  { from: 1, to: 2 },
-  { from: 2, to: 3 },
-  { from: 3, to: 4 },
-];
-
-const ConceptMap = () => {
-  const [nodes, setNodes] = useState(initialNodes);
-  const [links, setLinks] = useState(initialLinks);
+// Controlled component; remove seed defaults to prevent static data persistence
+const ConceptMap = ({ nodes: propNodes = [], links: propLinks = [], onChange }) => {
+  const [nodes, setNodes] = useState(Array.isArray(propNodes) ? propNodes : []);
+  const [links, setLinks] = useState(Array.isArray(propLinks) ? propLinks : []);
   const [draggedNode, setDraggedNode] = useState(null);
   const [offset, setOffset] = useState({ x: 0, y: 0 });
+  const [linkFrom, setLinkFrom] = useState(null);
+  const [selectedNodeId, setSelectedNodeId] = useState(null);
+  const [selectedLinkIdx, setSelectedLinkIdx] = useState(null);
   const svgRef = useRef();
 
-  // Drag logic
+  // Keep local state in sync when parent props change
+  useEffect(() => {
+    setNodes(Array.isArray(propNodes) ? propNodes : []);
+  }, [propNodes]);
+  useEffect(() => {
+    setLinks(Array.isArray(propLinks) ? propLinks : []);
+  }, [propLinks]);
+
+  // Notify parent when state changes
+  useEffect(() => {
+    if (typeof onChange === 'function') onChange({ nodes, links });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [nodes, links]);
+
   const handleMouseDown = (e, node) => {
     setDraggedNode(node.id);
-    setOffset({
-      x: e.clientX - node.x,
-      y: e.clientY - node.y
-    });
+    setSelectedNodeId(node.id);
+    setSelectedLinkIdx(null);
+    setOffset({ x: e.clientX - node.x, y: e.clientY - node.y });
   };
+
   const handleMouseMove = (e) => {
-    if (draggedNode) {
-      setNodes(nodes => nodes.map(n =>
-        n.id === draggedNode ? { ...n, x: e.clientX - offset.x, y: e.clientY - offset.y } : n
-      ));
-    }
+    if (!draggedNode) return;
+    setNodes((curr) => curr.map((n) => (
+      n.id === draggedNode ? { ...n, x: e.clientX - offset.x, y: e.clientY - offset.y } : n
+    )));
   };
+
   const handleMouseUp = () => setDraggedNode(null);
 
-  // Add new node
   const addNode = () => {
-    const newId = nodes.length + 1;
+    const newId = nodes.length ? Math.max(...nodes.map(n => n.id)) + 1 : 1;
     setNodes([...nodes, { id: newId, label: `Concept ${newId}`, x: 200, y: 200 }]);
   };
 
-  // Add new link
-  const [linkFrom, setLinkFrom] = useState(null);
   const handleNodeClick = (id) => {
     if (linkFrom === null) {
       setLinkFrom(id);
-    } else if (linkFrom !== id) {
-      setLinks([...links, { from: linkFrom, to: id }]);
-      setLinkFrom(null);
-    } else {
-      setLinkFrom(null);
+      setSelectedNodeId(id);
+      setSelectedLinkIdx(null);
+      return;
+    }
+    if (linkFrom !== id) {
+      setLinks((curr) => [...curr, { from: linkFrom, to: id }]);
+    }
+    setLinkFrom(null);
+  };
+
+  const handleLinkClick = (idx) => {
+    setSelectedLinkIdx(idx);
+    setSelectedNodeId(null);
+  };
+
+  const deleteSelected = () => {
+    if (selectedNodeId != null) {
+      setLinks(links.filter(l => l.from !== selectedNodeId && l.to !== selectedNodeId));
+      setNodes(nodes.filter(n => n.id !== selectedNodeId));
+      setSelectedNodeId(null);
+    } else if (selectedLinkIdx != null) {
+      setLinks(links.filter((_, i) => i !== selectedLinkIdx));
+      setSelectedLinkIdx(null);
     }
   };
 
-  React.useEffect(() => {
+  const renameNode = (id, label) => {
+    setNodes(nodes.map(n => n.id === id ? { ...n, label } : n));
+  };
+
+  useEffect(() => {
     if (draggedNode) {
       window.addEventListener('mousemove', handleMouseMove);
       window.addEventListener('mouseup', handleMouseUp);
@@ -68,7 +92,7 @@ const ConceptMap = () => {
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('mouseup', handleMouseUp);
     };
-  });
+  }, [draggedNode, offset]);
 
   return (
     <div className="concept-map">
@@ -76,6 +100,7 @@ const ConceptMap = () => {
         <h2>Concept Map</h2>
         <p>Drag nodes to rearrange. Click two nodes to link them.</p>
         <button className="add-node-btn" onClick={addNode}>+ Add Concept</button>
+        <button onClick={deleteSelected} disabled={selectedNodeId == null && selectedLinkIdx == null}>Delete Selected</button>
         {linkFrom && <span className="link-hint">Select another node to create a link</span>}
       </div>
       <div className="concept-map-content" style={{ height: 500, position: 'relative' }}>
@@ -86,14 +111,15 @@ const ConceptMap = () => {
             if (!from || !to) return null;
             return (
               <line
-                key={i}
+                key={`${link.from}-${link.to}-${i}`}
                 x1={from.x + 60}
                 y1={from.y + 30}
                 x2={to.x + 60}
                 y2={to.y + 30}
-                stroke="#3b82f6"
-                strokeWidth={3}
+                stroke={selectedLinkIdx === i ? '#ef4444' : '#3b82f6'}
+                strokeWidth={selectedLinkIdx === i ? 4 : 3}
                 markerEnd="url(#arrowhead)"
+                onClick={() => handleLinkClick(i)}
               />
             );
           })}
@@ -103,15 +129,26 @@ const ConceptMap = () => {
             </marker>
           </defs>
         </svg>
-        {nodes.map(node => (
+        {nodes.map((node) => (
           <div
             key={node.id}
-            className={`concept-node${linkFrom === node.id ? ' linking' : ''}`}
+            className={`concept-node${linkFrom === node.id ? ' linking' : ''}${selectedNodeId === node.id ? ' selected' : ''}`}
             style={{ left: node.x, top: node.y, position: 'absolute', zIndex: 1, cursor: 'grab' }}
-            onMouseDown={e => handleMouseDown(e, node)}
+            onMouseDown={(e) => handleMouseDown(e, node)}
             onClick={() => handleNodeClick(node.id)}
           >
-            {node.label}
+            <input
+              value={node.label}
+              onChange={(e) => renameNode(node.id, e.target.value)}
+              style={{
+                border: 'none',
+                background: 'transparent',
+                outline: 'none',
+                width: 140,
+                textAlign: 'center',
+                fontWeight: 600
+              }}
+            />
           </div>
         ))}
       </div>

@@ -1,0 +1,67 @@
+name: Playwright Tests
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    timeout-minutes: 60
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 18
+        cache: 'npm'
+        cache-dependency-path: |
+          frontend/package-lock.json
+          backend/package-lock.json
+    
+    - name: Install Frontend Dependencies
+      run: cd frontend && npm ci
+    
+    - name: Install Backend Dependencies
+      run: cd backend && npm ci
+    
+    - name: Install Playwright Browsers
+      run: cd frontend && npx playwright install --with-deps
+    
+    - name: Start Backend Server
+      run: |
+        cd backend
+        npm start &
+        sleep 10
+      env:
+        MONGO_URI: ${{ secrets.MONGO_URI || 'mongodb://localhost:27017/chemconcept-test' }}
+        PORT: 5000
+    
+    - name: Start Frontend Server
+      run: |
+        cd frontend
+        npm start &
+        sleep 15
+      env:
+        REACT_APP_API_URL: http://localhost:5000
+    
+    - name: Run Playwright Tests
+      run: cd frontend && npm run test:e2e
+      env:
+        CI: true
+    
+    - uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: playwright-report
+        path: frontend/playwright-report/
+        retention-days: 30
+    
+    - uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: test-results
+        path: frontend/test-results/
+        retention-days: 30

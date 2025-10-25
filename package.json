@@ -1,0 +1,25 @@
+{
+  "name": "chemconcept-bridge",
+  "version": "1.0.0",
+  "description": "An AI-powered chemistry learning platform that bridges the gap between abstract chemistry concepts and student understanding. The platform uses adaptive quizzes, misconception detection, visual simulations, and personalized remediation to make learning interactive, engaging, and exam-ready.",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Ansu3234/ChemConceptBridge.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Ansu3234/ChemConceptBridge/issues"
+  },
+  "homepage": "https://github.com/Ansu3234/ChemConceptBridge#readme",
+  "devDependencies": {
+    "@playwright/test": "^1.56.1",
+    "@types/node": "^24.9.1"
+  }
+}

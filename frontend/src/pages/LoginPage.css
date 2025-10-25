@@ -154,15 +154,47 @@ select:focus {
   box-shadow: 0 0 0 2px rgba(52, 73, 94, 0.2);
 }
 
+/* Error styles */
+.input-error {
+  border-color: #e74c3c !important;
+  background-color: #fff8f8;
+  box-shadow: 0 0 0 1px rgba(231, 76, 60, 0.2);
+}
+
+.error-message {
+  color: #e74c3c;
+  font-size: 13px;
+  margin-top: 5px;
+  font-weight: 500;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.success-message {
+  color: #27ae60;
+  font-size: 13px;
+  margin-top: 5px;
+  font-weight: 500;
+  animation: fadeIn 0.3s ease-in-out;
+  background-color: rgba(39, 174, 96, 0.1);
+  padding: 8px 12px;
+  border-radius: 4px;
+  border-left: 3px solid #27ae60;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
 .otp-checkbox {
   margin-top: 10px;
 }
 
+
 .login-options {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  margin: 15px 0;
+  margin: 15px 0 0 0;
 }
 
 .forgot-link {
@@ -177,18 +209,24 @@ select:focus {
   text-decoration: underline;
 }
 
+
 .login-options label {
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: 8px;
   margin: 0;
-  font-weight: normal;
+  font-weight: 500;
   cursor: pointer;
+  font-size: 15px;
 }
 
+
 .login-options input[type="checkbox"] {
-  margin: 0;
+  margin: 0 4px 0 0;
   cursor: pointer;
+  accent-color: #00b4d8;
+  width: 18px;
+  height: 18px;
 }
 
 .login-btn {
@@ -206,6 +244,7 @@ select:focus {
   font-size: 16px;
   text-transform: uppercase;
   box-shadow: 0 4px 15px rgba(0, 119, 182, 0.3);
+  position: relative;
 }
 
 .login-btn:hover {
@@ -215,8 +254,17 @@ select:focus {
 }
 
 .login-btn:disabled {
-  background-color: #95a5a6;
-  cursor: not-allowed;
+  background: linear-gradient(90deg, #0077b6, #00b4d8);
+  opacity: 0.7;
+  cursor: wait;
+  transform: none;
+  box-shadow: 0 4px 15px rgba(0, 119, 182, 0.2);
+}
+
+/* Loading spinner animation */
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
 .divider {

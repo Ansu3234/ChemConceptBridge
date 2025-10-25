@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import './ConfidenceMeter.css';
 
 const ConfidenceMeter = ({ onSubmit }) => {
-  const [confidence, setConfidence] = useState(0);
+  const [confidence, setConfidence] = useState(50);
   const [submitted, setSubmitted] = useState(false);
 
   const handleChange = (e) => {
@@ -25,6 +25,7 @@ const ConfidenceMeter = ({ onSubmit }) => {
             type="range"
             min="0"
             max="100"
+            step="5"
             value={confidence}
             onChange={handleChange}
             className="slider"
@@ -34,7 +35,7 @@ const ConfidenceMeter = ({ onSubmit }) => {
             <span>Very Confident</span>
           </div>
         </div>
-        <div className="confidence-value">{confidence}%</div>
+        <div className="confidence-value">{confidence}% (server will map to 1–5)</div>
         <button className="submit-btn" type="submit" disabled={submitted}>
           {submitted ? 'Submitted' : 'Submit Confidence'}
         </button>

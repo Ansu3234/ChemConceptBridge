@@ -26,32 +26,254 @@
 .progress-content {
   flex: 1;
   display: flex;
+  flex-direction: column;
+  padding: 24px;
+  overflow-y: auto;
+}
+
+/* Loading and Error States */
+.loading-spinner {
+  display: flex;
   align-items: center;
   justify-content: center;
-  padding: 48px 24px;
+  height: 200px;
+  color: #64748b;
+  font-size: 16px;
 }
 
-.coming-soon {
+.error-message {
   text-align: center;
   max-width: 400px;
+  margin: 0 auto;
+  padding: 24px;
 }
 
-.coming-soon-icon {
-  font-size: 64px;
+.error-icon {
+  font-size: 48px;
+  margin-bottom: 16px;
+}
+
+.error-message h3 {
+  color: #dc2626;
+  margin: 0 0 8px 0;
+}
+
+.error-message p {
+  color: #64748b;
+  margin: 0 0 16px 0;
+}
+
+.retry-button {
+  background-color: #ef4444;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.retry-button:hover {
+  background-color: #dc2626;
+}
+
+/* Stats Grid */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
   margin-bottom: 24px;
-  opacity: 0.6;
 }
 
-.coming-soon h3 {
-  color: #1e293b;
+.stat-card {
+  background: white;
+  border-radius: 8px;
+  padding: 16px;
+  text-align: center;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+}
+
+.stat-icon {
   font-size: 24px;
+  margin-bottom: 8px;
+}
+
+.stat-value {
+  font-size: 28px;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 4px;
+}
+
+.stat-label {
+  color: #64748b;
+  font-size: 14px;
+}
+
+/* Charts Grid */
+.charts-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+  margin-bottom: 32px;
+}
+
+.chart-container {
+  background: white;
+  border-radius: 8px;
+  padding: 16px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.chart-container h3 {
+  color: #1e293b;
+  font-size: 18px;
   font-weight: 600;
   margin: 0 0 16px 0;
 }
 
-.coming-soon p {
+.donut-chart {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Activity List */
+.activity-list {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.activity-item {
+  display: flex;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.activity-item:last-child {
+  border-bottom: none;
+}
+
+.activity-icon {
+  font-size: 20px;
+  margin-right: 12px;
+}
+
+.activity-details {
+  flex: 1;
+}
+
+.activity-title {
+  font-weight: 500;
+  color: #1e293b;
+  margin-bottom: 4px;
+}
+
+.activity-meta {
+  display: flex;
+  justify-content: space-between;
   color: #64748b;
+  font-size: 14px;
+}
+
+.activity-score {
+  font-weight: 500;
+  color: #16a34a;
+}
+
+.empty-activity {
+  text-align: center;
+  padding: 24px;
+  color: #64748b;
+}
+
+/* Recommendations */
+.recommendations {
+  margin-top: 16px;
+}
+
+.recommendations h3 {
+  color: #1e293b;
+  font-size: 20px;
+  font-weight: 600;
+  margin: 0 0 16px 0;
+}
+
+.recommendation-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.recommendation-card {
+  background: white;
+  border-radius: 8px;
+  padding: 16px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease;
+}
+
+.recommendation-card:hover {
+  transform: translateY(-2px);
+}
+
+.recommendation-icon {
+  font-size: 24px;
+  margin-bottom: 12px;
+}
+
+.recommendation-card h4 {
+  color: #1e293b;
   font-size: 16px;
-  line-height: 1.6;
-  margin: 0;
+  font-weight: 600;
+  margin: 0 0 8px 0;
+}
+
+.recommendation-card p {
+  color: #64748b;
+  font-size: 14px;
+  margin: 0 0 16px 0;
+  line-height: 1.5;
+}
+
+.recommendation-button {
+  background-color: #3b82f6;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+  width: 100%;
+}
+
+.recommendation-button:hover {
+  background-color: #2563eb;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .charts-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .recommendation-cards {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
 }

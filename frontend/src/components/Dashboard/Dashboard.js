@@ -31,7 +31,9 @@ const Dashboard = () => {
       
       // Redirect to the appropriate dashboard based on role and current URL
       const currentPath = window.location.pathname;
-      if (payload.role === 'teacher' && currentPath !== '/teacher-dashboard') {
+      if (payload.role === 'admin' && currentPath !== '/admin-dashboard') {
+        navigate('/admin-dashboard');
+      } else if (payload.role === 'teacher' && currentPath !== '/teacher-dashboard') {
         navigate('/teacher-dashboard');
       } else if (payload.role === 'student' && currentPath !== '/student-dashboard') {
         navigate('/student-dashboard');
@@ -50,7 +52,7 @@ const Dashboard = () => {
     navigate('/');
   };
 
-  if (loading) {
+  if (loading || !user) {
     return (
       <div className="loading-container">
         <div className="loading-spinner"></div>
@@ -62,11 +64,11 @@ const Dashboard = () => {
   const renderDashboardContent = () => {
     switch (user.role) {
       case 'student':
-        return <StudentDashboard activeTab={activeTab} setActiveTab={setActiveTab} />;
+        return <StudentDashboard activeTab={activeTab} setActiveTab={setActiveTab} user={user} />;
       case 'teacher':
-        return <TeacherDashboard activeTab={activeTab} setActiveTab={setActiveTab} />;
+        return <TeacherDashboard activeTab={activeTab} setActiveTab={setActiveTab} user={user} />;
       case 'admin':
-        return <AdminDashboard activeTab={activeTab} setActiveTab={setActiveTab} />;
+        return <AdminDashboard activeTab={activeTab} setActiveTab={setActiveTab} user={user} />;
       default:
         return <div>Invalid user role</div>;
     }

@@ -1,0 +1,41 @@
+/* Basic layout */
+.admin-users { padding: 16px; }
+.au-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+.au-sub { color: #666; margin-top: 4px; }
+
+/* Stats */
+.au-stats { display: grid; grid-template-columns: repeat(4, minmax(120px, 1fr)); gap: 12px; margin: 12px 0 16px; }
+.stat { background: #f6f8fb; border: 1px solid #e6e9ef; padding: 12px; border-radius: 8px; }
+.stat .label { color: #667085; font-size: 12px; }
+.stat .value { display: block; font-size: 20px; font-weight: 600; margin-top: 6px; }
+
+/* Buttons */
+.btn { border: 1px solid #d0d5dd; background: white; padding: 8px 12px; border-radius: 8px; cursor: pointer; }
+.btn.primary { background: #2563eb; border-color: #2563eb; color: white; }
+.btn.danger { background: #ef4444; border-color: #ef4444; color: white; }
+.btn:disabled { opacity: 0.7; cursor: not-allowed; }
+
+/* Form */
+.au-form { border: 1px solid #e6e9ef; background: #fff; border-radius: 8px; padding: 12px; margin-bottom: 16px; }
+.au-form .row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+.au-form .row.end { display: flex; justify-content: flex-end; gap: 8px; }
+.field { position: relative; margin-bottom: 8px; }
+.field label { display: block; font-size: 12px; color: #667085; margin-bottom: 6px; }
+.field input, .field select { width: 100%; padding: 8px; border-radius: 8px; border: 1px solid #d0d5dd; }
+.field input.error, .field select.error { border-color: #ef4444; background-color: #fef2f2; }
+.error-text { color: #ef4444; font-size: 12px; margin-top: 4px; }
+
+/* Table */
+.au-table-wrapper { border: 1px solid #e6e9ef; border-radius: 8px; overflow: hidden; background: #fff; }
+.au-table { width: 100%; border-collapse: collapse; }
+.au-table th, .au-table td { padding: 10px 12px; border-bottom: 1px solid #f0f2f5; text-align: left; }
+.au-table thead th { background: #f8fafc; font-weight: 600; font-size: 14px; color: #334155; }
+.au-table tbody tr:hover { background: #fafafa; }
+.role-select { padding: 6px 8px; border-radius: 6px; border: 1px solid #d0d5dd; }
+.empty { text-align: center; color: #667085; }
+
+/* Alerts */
+.au-alert.error { background: #fee2e2; border: 1px solid #fecaca; color: #991b1b; padding: 10px; border-radius: 8px; margin-bottom: 12px; }
+
+/* Loading */
+.loading { padding: 16px; color: #667085; }

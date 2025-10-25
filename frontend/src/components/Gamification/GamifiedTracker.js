@@ -1,27 +1,24 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import './GamifiedTracker.css';
-
-const mockUser = {
-  name: 'Student A',
-  xp: 1240,
-  badges: [
-    { name: 'Quiz Novice', icon: '🏅', desc: 'Completed 3 quizzes' },
-    { name: 'Acid Ace', icon: '⚗️', desc: 'Scored 90%+ in Acids & Bases' },
-    { name: 'Streak Starter', icon: '🔥', desc: '3 quizzes in a row' }
-  ]
-};
-
-const mockLeaderboard = [
-  { name: 'Student A', xp: 1240 },
-  { name: 'Student B', xp: 1100 },
-  { name: 'Student C', xp: 950 },
-  { name: 'Student D', xp: 800 },
-  { name: 'Student E', xp: 700 }
-];
+import api from '../../apiClient';
 
 const GamifiedTracker = () => {
-  const [user] = useState(mockUser);
-  const [leaderboard] = useState(mockLeaderboard);
+  const [user, setUser] = useState({ name: '', xp: 0, badges: [] });
+  const [leaderboard, setLeaderboard] = useState([]);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const { data } = await api.get('/user/gamification');
+        const me = data?.me || { xp: 0, badges: [] };
+        setUser({ name: 'Me', xp: me.xp || 0, badges: (me.badges || []).map(b => ({ name: b, icon: '🏅', desc: b })) });
+        setLeaderboard(data?.leaderboard || []);
+      } catch (e) {
+        setUser({ name: 'Me', xp: 0, badges: [] });
+        setLeaderboard([]);
+      }
+    })();
+  }, []);
 
   return (
     <div className="gamified-tracker">
@@ -46,7 +43,7 @@ const GamifiedTracker = () => {
           <ol>
             {leaderboard.map((entry, idx) => (
               <li key={idx} className={entry.name === user.name ? 'gt-me' : ''}>
-                <span className="gt-rank">#{idx + 1}</span>
+                <span className="gt-rank">#{entry.rank || (idx + 1)}</span>
                 <span className="gt-lb-name">{entry.name}</span>
                 <span className="gt-lb-xp">{entry.xp} XP</span>
               </li>

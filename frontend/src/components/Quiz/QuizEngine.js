@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './QuizEngine.css';
+import api from '../../apiClient';
+import RemediationModule from '../Remediation/RemediationModule';
 
 const QuizEngine = () => {
   const [quizzes, setQuizzes] = useState([]);
@@ -11,94 +13,55 @@ const QuizEngine = () => {
   const [score, setScore] = useState(0);
   const [timeLeft, setTimeLeft] = useState(0);
   const [showResults, setShowResults] = useState(false);
+  const [lastAttemptId, setLastAttemptId] = useState(null);
 
   useEffect(() => {
-    // Load available quizzes
-    const mockQuizzes = [
-      {
-        id: 1,
-        title: 'Acids and Bases Fundamentals',
-        description: 'Test your understanding of acid-base concepts',
-        difficulty: 'Intermediate',
-        duration: 15,
-        questions: 10,
-        topic: 'acids-bases',
-        questions: [
-          {
-            id: 1,
-            question: 'What is the pH of a solution with [H⁺] = 1 × 10⁻³ M?',
-            options: ['3', '7', '11', '14'],
-            correct: 0,
-            explanation: 'pH = -log[H⁺] = -log(1 × 10⁻³) = 3',
-            misconceptions: {
-              1: 'A pH of 7 is neutral, but this solution is acidic due to higher [H⁺].',
-              2: 'A pH of 11 is basic, not acidic. Check your calculation.',
-              3: 'A pH of 14 is highly basic, not acidic.'
-            }
-          },
-          {
-            id: 2,
-            question: 'Which of the following is a strong acid?',
-            options: ['CH₃COOH', 'HCl', 'H₂CO₃', 'HF'],
-            correct: 1,
-            explanation: 'HCl is a strong acid that completely dissociates in water',
-            misconceptions: {
-              0: 'CH₃COOH is a weak acid; it does not fully dissociate.',
-              2: 'H₂CO₃ is a weak acid; it partially dissociates.',
-              3: 'HF is a weak acid despite being a halide.'
-            }
-          },
-          {
-            id: 3,
-            question: 'What happens when an acid and base react?',
-            options: ['Formation of salt and water', 'Formation of gas', 'No reaction', 'Formation of precipitate'],
-            correct: 0,
-            explanation: 'Acid + Base → Salt + Water (neutralization reaction)',
-            misconceptions: {
-              1: 'Gas formation is not typical for acid-base neutralization.',
-              2: 'Acids and bases do react; neutralization occurs.',
-              3: 'Precipitate formation is not the main reaction here.'
-            }
-          }
-        ]
-      },
-      {
-        id: 2,
-        title: 'Periodic Table Basics',
-        description: 'Test your knowledge of elements and periodic trends',
-        difficulty: 'Beginner',
-        duration: 10,
-        questions: 8,
-        topic: 'periodic-table',
-        questions: [
-          {
-            id: 1,
-            question: 'How many elements are in the first period of the periodic table?',
-            options: ['2', '8', '18', '32'],
-            correct: 0,
-            explanation: 'The first period contains only 2 elements: hydrogen and helium'
-          },
-          {
-            id: 2,
-            question: 'Which group contains the noble gases?',
-            options: ['Group 1', 'Group 7', 'Group 8', 'Group 18'],
-            correct: 3,
-            explanation: 'Group 18 contains the noble gases (He, Ne, Ar, Kr, Xe, Rn)'
-          }
-        ]
+    (async () => {
+      try {
+        const { data } = await api.get('/quiz');
+        const list = (data || []).map(q => ({
+          id: q._id,
+          title: q.title,
+          description: q.description,
+          difficulty: q.difficulty,
+          duration: q.duration,
+          topic: q.topic,
+          questionsCount: Array.isArray(q.questions) ? q.questions.length : (q.questions || 0)
+        }));
+        setQuizzes(list);
+      } catch (e) {
+        setQuizzes([]);
       }
-    ];
-    setQuizzes(mockQuizzes);
+    })();
   }, []);
 
-  const startQuiz = (quiz) => {
-    setSelectedQuiz(quiz);
-    setQuizStarted(true);
-    setCurrentQuestion(0);
-    setAnswers({});
-    setTimeLeft(quiz.duration * 60); // Convert minutes to seconds
-    setQuizCompleted(false);
-    setShowResults(false);
+  const startQuiz = async (quiz) => {
+    try {
+      const { data } = await api.get(`/quiz/${quiz.id}`);
+      const full = {
+        id: data._id,
+        title: data.title,
+        description: data.description,
+        difficulty: data.difficulty,
+        duration: data.duration,
+        topic: data.topic,
+        questions: (data.questions || []).map(q => ({
+          id: q._id,
+          question: q.question,
+          options: q.options,
+        }))
+      };
+      setSelectedQuiz(full);
+      setQuizStarted(true);
+      setCurrentQuestion(0);
+      setAnswers({});
+      setTimeLeft(full.duration * 60);
+      setQuizCompleted(false);
+      setShowResults(false);
+      setLastAttemptId(null);
+    } catch (e) {
+      // noop
+    }
   };
 
   const handleAnswerSelect = (questionId, answerIndex) => {
@@ -122,20 +85,27 @@ const QuizEngine = () => {
     }
   };
 
-  const finishQuiz = () => {
+  const finishQuiz = async () => {
     setQuizCompleted(true);
-    calculateScore();
-    setShowResults(true);
-  };
-
-  const calculateScore = () => {
-    let correct = 0;
-    selectedQuiz.questions.forEach(question => {
-      if (answers[question.id] === question.correct) {
-        correct++;
+    // Submit attempt to server
+    try {
+      const payload = {
+        answers: Object.entries(answers).map(([questionId, selectedOption]) => ({ questionId, selectedOption, timeSpent: 0 })),
+        timeSpent: (selectedQuiz.duration * 60) - timeLeft,
+        confidenceLevel: 3
+      };
+      const res = await api.post(`/quiz/${selectedQuiz.id}/attempt`, payload);
+      if (res?.data?.score != null) {
+        setScore(res.data.score);
       }
-    });
-    setScore(Math.round((correct / selectedQuiz.questions.length) * 100));
+      if (res?.data?.attemptId) {
+        setLastAttemptId(res.data.attemptId);
+      }
+    } catch (e) {
+      // ignore submit errors in UI for now
+    }
+
+    setShowResults(true);
   };
 
   const resetQuiz = () => {
@@ -186,37 +156,7 @@ const QuizEngine = () => {
             <p>You answered {Object.keys(answers).length} out of {selectedQuiz.questions.length} questions</p>
           </div>
           
-          <div className="results-breakdown">
-            <h4>Question Review</h4>
-            {selectedQuiz.questions.map((question, index) => {
-              const userAnswer = answers[question.id];
-              const isCorrect = userAnswer === question.correct;
-              let misconceptionMsg = null;
-              if (!isCorrect && userAnswer !== undefined && question.misconceptions && question.misconceptions[userAnswer] ) {
-                misconceptionMsg = question.misconceptions[userAnswer];
-              }
-              return (
-                <div key={question.id} className={`question-review ${isCorrect ? 'correct' : 'incorrect'}`}>
-                  <div className="question-number">Q{index + 1}</div>
-                  <div className="question-content">
-                    <div className="question-text">{question.question}</div>
-                    <div className="answer-feedback">
-                      <strong>Your answer:</strong> {question.options[userAnswer] || 'Not answered'}
-                      {!isCorrect && (
-                        <>
-                          <div><strong>Correct answer:</strong> {question.options[question.correct]}</div>
-                          {misconceptionMsg && (
-                            <div className="misconception-feedback"><strong>Misconception:</strong> {misconceptionMsg}</div>
-                          )}
-                        </>
-                      )}
-                      <div className="explanation">{question.explanation}</div>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
+          <div className="results-note">Detailed answer review is hidden to prevent sharing of answer keys. Focus on the recommended next steps below.</div>
           
           <div className="results-actions">
             <button className="btn btn-primary" onClick={resetQuiz}>
@@ -227,6 +167,12 @@ const QuizEngine = () => {
             </button>
           </div>
         </div>
+        {lastAttemptId ? (
+          <div className="remediation-wrap">
+            <h3>Recommended next steps</h3>
+            <RemediationModule attemptId={lastAttemptId} />
+          </div>
+        ) : null}
       </div>
     );
   }
@@ -318,7 +264,7 @@ const QuizEngine = () => {
               </div>
               <div className="meta-item">
                 <span className="meta-icon">📝</span>
-                <span>{quiz.questions} questions</span>
+                <span>{quiz.questionsCount} questions</span>
               </div>
               <div className="meta-item">
                 <span className="meta-icon">🧪</span>

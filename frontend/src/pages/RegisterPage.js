@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
 import "./RegisterPage.css";
@@ -14,6 +14,8 @@ function RegisterPage() {
   const [error, setError] = useState("");
   const [touched, setTouched] = useState({ name: false, email: false, password: false, confirmPassword: false });
   const [emailExists, setEmailExists] = useState(false);
+  const [emailChecking, setEmailChecking] = useState(false);
+  const emailCheckTimeout = useRef(null);
 
   // Validation functions
   const validateName = (value) => {
@@ -27,28 +29,41 @@ function RegisterPage() {
     return "";
   };
 
-  // Check if email exists on blur only
   const handleEmailChange = (e) => {
     const value = e.target.value;
     setEmail(value);
     setTouched(t => ({ ...t, email: true }));
     setEmailExists(false);
+    if (emailCheckTimeout.current) {
+      clearTimeout(emailCheckTimeout.current);
+    }
+    // Debounce live uniqueness check while typing
+    emailCheckTimeout.current = setTimeout(async () => {
+      if (/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(value)) {
+        try {
+          setEmailChecking(true);
+          const res = await axios.post("http://localhost:5000/api/auth/check-email", { email: value });
+          setEmailExists(!!res.data?.exists);
+        } catch (err) {
+          setEmailExists(false);
+        } finally {
+          setEmailChecking(false);
+        }
+      } else {
+        setEmailChecking(false);
+      }
+    }, 350);
   };
 
   const handleEmailBlur = async () => {
     setTouched(t => ({ ...t, email: true }));
-    if (/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
-      try {
-        const res = await axios.post("http://localhost:5000/api/auth/check-email", { email });
-        setEmailExists(res.data.exists);
-      } catch (err) {
-        setEmailExists(false);
-      }
-    }
+    // No-op; live validation handles this already
   };
   const validatePassword = (value) => {
     if (!value) return "Password is required";
     if (value.length < 6) return "Password must be at least 6 characters";
+    if (!/[A-Z]/.test(value)) return "Password must contain at least one uppercase letter";
+    if (!/[0-9]/.test(value)) return "Password must contain at least one number";
     return "";
   };
   const validateConfirmPassword = (value) => {
@@ -119,9 +134,15 @@ function RegisterPage() {
               onChange={handleEmailChange}
               onBlur={handleEmailBlur}
               className={touched.email && validateEmail(email) ? 'input-error' : ''}
-              autoComplete="email"
+              autoComplete="off"
             />
             {touched.email && validateEmail(email) && <p className="error-message">{validateEmail(email)}</p>}
+            {touched.email && !validateEmail(email) && emailChecking && (
+              <p className="info-message">Checking email availability…</p>
+            )}
+            {touched.email && !emailChecking && email && !validateEmail(email) && emailExists && (
+              <p className="error-message">This email is already registered</p>
+            )}
           </div>
 
           <div className="form-group">
@@ -162,8 +183,9 @@ function RegisterPage() {
             type="submit"
             className="register-btn"
             disabled={loading}
+          disabled={loading || emailChecking || emailExists || !!validateEmail(email)}
           >
-            {loading ? 'Registering...' : 'Create Account'}
+            {loading ? 'Registering...' : (emailExists ? 'Email Already Registered' : 'Create Account')}
           </button>
           <div className="divider"><span>OR</span></div>
           <div className="login-links">

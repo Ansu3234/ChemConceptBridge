@@ -96,12 +96,12 @@ chemconcept-bridge/
    ```
 
 4. **Environment Setup**
-   Create a `.env` file in the backend directory:
-   ```env
-   MONGO_URI=mongodb://localhost:27017/chemconcept-bridge
-   JWT_SECRET=your-secret-key
-   PORT=5000
+   Copy `.env.example` to `.env` in the backend directory and fill in values:
+   ```bash
+   cd backend
+   Copy-Item .env.example .env  # Windows PowerShell (use: cp .env.example .env on Unix)
    ```
+   Then edit `.env` and set your secrets (Mongo URI, JWT secret, Google OAuth, email, etc.).
 
 5. **Start the development servers**
    

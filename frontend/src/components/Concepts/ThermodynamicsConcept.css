@@ -1,57 +1,409 @@
 .thermodynamics-concept {
-  height: 100%;
   display: flex;
   flex-direction: column;
+  min-height: 100%;
 }
 
-.concept-header {
-  padding: 24px;
-  background: linear-gradient(135deg, #fee2e2, #fecaca);
-  border-bottom: 1px solid #e2e8f0;
-}
-
-.concept-header h2 {
-  color: #dc2626;
-  font-size: 24px;
-  font-weight: 700;
-  margin: 0 0 8px 0;
-}
-
-.concept-header p {
-  color: #991b1b;
-  font-size: 16px;
-  margin: 0;
-}
-
-.concept-content {
-  flex: 1;
+.thermo-header {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 48px 24px;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 24px 32px;
+  background: linear-gradient(135deg, #fee2e2, #fecaca);
+  border-bottom: 1px solid #fecaca;
+  gap: 24px;
 }
 
-.coming-soon {
-  text-align: center;
-  max-width: 400px;
+.thermo-header h2 {
+  margin: 0 0 8px 0;
+  font-size: 28px;
+  font-weight: 700;
+  color: #b91c1c;
 }
 
-.coming-soon-icon {
-  font-size: 64px;
-  margin-bottom: 24px;
-  opacity: 0.6;
-}
-
-.coming-soon h3 {
-  color: #1e293b;
-  font-size: 24px;
-  font-weight: 600;
-  margin: 0 0 16px 0;
-}
-
-.coming-soon p {
-  color: #64748b;
+.thermo-header p {
+  margin: 0;
+  color: #7f1d1d;
   font-size: 16px;
   line-height: 1.6;
+}
+
+.thermo-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.thermo-tag {
+  background: rgba(239, 68, 68, 0.16);
+  color: #b91c1c;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.thermo-navigation {
+  display: flex;
+  gap: 12px;
+  padding: 12px 24px;
+  background: #fef2f2;
+  border-bottom: 1px solid #fecaca;
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  overflow-x: auto;
+}
+
+.thermo-nav-btn {
+  border: none;
+  background: white;
+  color: #b91c1c;
+  padding: 10px 16px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 1px 3px rgba(127, 29, 29, 0.15);
+  transition: all 0.2s ease;
+}
+
+.thermo-nav-btn:hover {
+  background: #fee2e2;
+  color: #dc2626;
+  transform: translateY(-1px);
+}
+
+.thermo-nav-btn.active {
+  background: #dc2626;
+  color: white;
+  box-shadow: 0 8px 22px rgba(220, 38, 38, 0.25);
+}
+
+.thermo-nav-icon {
+  font-size: 18px;
+}
+
+.thermo-main {
+  flex: 1;
+  overflow-y: auto;
+  padding: 32px;
+  background: #fef2f2;
+}
+
+.thermo-section {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.thermo-section h3 {
   margin: 0;
+  font-size: 24px;
+  color: #991b1b;
+}
+
+.thermo-intro {
+  margin: 0;
+  color: #7f1d1d;
+  font-size: 16px;
+  line-height: 1.7;
+}
+
+.thermo-two-column {
+  display: grid;
+  grid-template-columns: 2fr 1.2fr;
+  gap: 24px;
+}
+
+.thermo-card {
+  background: white;
+  border-radius: 16px;
+  padding: 24px;
+  border: 1px solid #fecaca;
+  box-shadow: 0 12px 30px rgba(185, 28, 28, 0.12);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.thermo-card.highlight {
+  background: linear-gradient(135deg, rgba(248, 113, 113, 0.24), rgba(239, 68, 68, 0.14));
+}
+
+.thermo-card ul {
+  margin: 0;
+  padding-left: 20px;
+  color: #991b1b;
+  line-height: 1.6;
+}
+
+.thermo-card li + li {
+  margin-top: 6px;
+}
+
+.thermo-callout {
+  background: rgba(248, 113, 113, 0.18);
+  border-left: 4px solid #dc2626;
+  padding: 12px 16px;
+  border-radius: 10px;
+  color: #7f1d1d;
+  font-weight: 600;
+}
+
+.thermo-key-facts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+.thermo-fact-card {
+  background: white;
+  border-radius: 12px;
+  padding: 16px;
+  border: 1px solid #fecaca;
+  color: #7f1d1d;
+  box-shadow: 0 8px 22px rgba(248, 113, 113, 0.18);
+}
+
+.thermo-law-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 20px;
+}
+
+.thermo-law-card {
+  background: white;
+  border-radius: 16px;
+  padding: 20px;
+  border: 1px solid #fecaca;
+  box-shadow: 0 10px 28px rgba(220, 38, 38, 0.2);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.thermo-law-card h4 {
+  margin: 0;
+  color: #b91c1c;
+}
+
+.thermo-law-statement {
+  margin: 0;
+  font-weight: 600;
+  color: #7f1d1d;
+}
+
+.thermo-law-implication {
+  margin: 0;
+  color: #991b1b;
+}
+
+.thermo-enthalpy-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 20px;
+}
+
+.thermo-enthalpy-card {
+  background: white;
+  border-radius: 16px;
+  padding: 20px;
+  border: 1px solid #fecaca;
+  box-shadow: 0 10px 28px rgba(248, 113, 113, 0.22);
+  color: #7f1d1d;
+}
+
+.thermo-diagram {
+  background: white;
+  border-radius: 16px;
+  padding: 24px;
+  border: 1px solid #fecaca;
+  box-shadow: 0 12px 32px rgba(185, 28, 28, 0.18);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.thermo-axis {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.thermo-axis-label {
+  align-self: flex-start;
+  font-weight: 600;
+  color: #991b1b;
+}
+
+.thermo-diagram-content {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 16px;
+  align-items: center;
+}
+
+.thermo-diagram-side h4 {
+  margin: 0 0 8px 0;
+  color: #b91c1c;
+}
+
+.thermo-diagram-side p {
+  margin: 0;
+  color: #7f1d1d;
+}
+
+.thermo-diagram-middle {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.thermo-peak {
+  padding: 10px 14px;
+  border-radius: 999px;
+  color: white;
+  font-weight: 600;
+  box-shadow: 0 8px 22px rgba(248, 113, 113, 0.4);
+}
+
+.thermo-peak.exo {
+  background: #ea580c;
+}
+
+.thermo-arrow {
+  padding: 8px 12px;
+  border-radius: 999px;
+  font-weight: 600;
+}
+
+.thermo-arrow.exo {
+  background: rgba(244, 63, 94, 0.2);
+  color: #be123c;
+}
+
+.thermo-note {
+  background: rgba(251, 191, 36, 0.16);
+  border-left: 4px solid #d97706;
+  padding: 14px 18px;
+  border-radius: 10px;
+  color: #92400e;
+}
+
+.thermo-entropy-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 20px;
+}
+
+.thermo-entropy-card {
+  background: white;
+  border-radius: 16px;
+  padding: 20px;
+  border: 1px solid #fecaca;
+  box-shadow: 0 12px 30px rgba(244, 63, 94, 0.2);
+  color: #7f1d1d;
+}
+
+.thermo-gibbs-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 20px;
+}
+
+.thermo-gibbs-card {
+  background: white;
+  border-radius: 16px;
+  padding: 20px;
+  border: 1px solid #fecaca;
+  box-shadow: 0 12px 28px rgba(249, 115, 22, 0.24);
+  color: #7f1d1d;
+}
+
+.thermo-summary {
+  background: white;
+  border-radius: 16px;
+  padding: 24px;
+  border: 1px solid #fecaca;
+  box-shadow: 0 12px 30px rgba(220, 38, 38, 0.24);
+  overflow-x: auto;
+}
+
+.thermo-summary table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.thermo-summary th,
+.thermo-summary td {
+  padding: 12px;
+  border-bottom: 1px solid #fee2e2;
+  text-align: left;
+  color: #7f1d1d;
+}
+
+.thermo-summary th {
+  background: rgba(248, 113, 113, 0.2);
+  color: #b91c1c;
+}
+
+.thermo-practice-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 20px;
+}
+
+.thermo-practice-card {
+  background: white;
+  border-radius: 16px;
+  padding: 20px;
+  border: 1px solid #fecaca;
+  box-shadow: 0 10px 26px rgba(248, 113, 113, 0.2);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.thermo-practice-card h4 {
+  margin: 0;
+  color: #b91c1c;
+}
+
+.thermo-hint {
+  background: rgba(34, 197, 94, 0.16);
+  border-left: 4px solid #15803d;
+  padding: 10px 12px;
+  border-radius: 8px;
+  color: #166534;
+  font-weight: 600;
+}
+
+@media (max-width: 1100px) {
+  .thermo-summary table {
+    min-width: 480px;
+  }
+}
+
+@media (max-width: 1024px) {
+  .thermo-two-column {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .thermo-header {
+    flex-direction: column;
+  }
+
+  .thermo-main {
+    padding: 24px;
+  }
+
+  .thermo-navigation {
+    padding: 10px 16px;
+  }
 }

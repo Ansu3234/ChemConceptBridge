@@ -1,0 +1,336 @@
+.chemical-equations {
+  padding: 20px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.ce-header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.ce-header h2 {
+  color: #1e40af;
+  margin-bottom: 8px;
+  font-size: 2.5rem;
+}
+
+.ce-header p {
+  color: #6b7280;
+  font-size: 1.1rem;
+}
+
+.ce-content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 30px;
+  align-items: start;
+}
+
+.equations-list h3 {
+  color: #1e40af;
+  margin-bottom: 20px;
+  font-size: 1.5rem;
+}
+
+.equations-grid {
+  display: grid;
+  gap: 15px;
+  max-height: 600px;
+  overflow-y: auto;
+  padding-right: 10px;
+}
+
+.equation-card {
+  background: white;
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 20px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.equation-card:hover {
+  border-color: #3b82f6;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+}
+
+.equation-card.selected {
+  border-color: #1e40af;
+  background: #eff6ff;
+}
+
+.equation-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.difficulty-badge {
+  color: white;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.topic {
+  color: #6b7280;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.equation-text {
+  font-family: 'Courier New', monospace;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 12px;
+  background: #f9fafb;
+  padding: 8px 12px;
+  border-radius: 6px;
+}
+
+.equation-stats {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.75rem;
+  color: #6b7280;
+}
+
+.practice-area {
+  background: white;
+  border-radius: 12px;
+  padding: 30px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e5e7eb;
+}
+
+.practice-card h3 {
+  color: #1e40af;
+  margin-bottom: 20px;
+  font-size: 1.5rem;
+}
+
+.equation-to-balance {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 25px;
+}
+
+.original-equation,
+.balanced-equation {
+  font-family: 'Courier New', monospace;
+  font-size: 1.1rem;
+  margin-bottom: 8px;
+}
+
+.original-equation {
+  color: #dc2626;
+}
+
+.balanced-equation {
+  color: #059669;
+}
+
+.input-section {
+  margin-bottom: 25px;
+}
+
+.input-section label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: #374151;
+}
+
+.answer-input {
+  width: 100%;
+  padding: 12px 16px;
+  border: 2px solid #d1d5db;
+  border-radius: 8px;
+  font-family: 'Courier New', monospace;
+  font-size: 1rem;
+  margin-bottom: 15px;
+  transition: border-color 0.3s ease;
+}
+
+.answer-input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.button-group {
+  display: flex;
+  gap: 12px;
+}
+
+.check-btn,
+.hints-btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.check-btn {
+  background: #3b82f6;
+  color: white;
+}
+
+.check-btn:hover:not(:disabled) {
+  background: #2563eb;
+}
+
+.check-btn:disabled {
+  background: #9ca3af;
+  cursor: not-allowed;
+}
+
+.hints-btn {
+  background: #f3f4f6;
+  color: #374151;
+  border: 1px solid #d1d5db;
+}
+
+.hints-btn:hover {
+  background: #e5e7eb;
+}
+
+.hints-section {
+  background: #fef3c7;
+  border: 1px solid #f59e0b;
+  border-radius: 8px;
+  padding: 15px;
+  margin-bottom: 20px;
+}
+
+.hints-section h4 {
+  color: #92400e;
+  margin-bottom: 10px;
+}
+
+.hints-section ul {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.hints-section li {
+  color: #92400e;
+  margin-bottom: 5px;
+}
+
+.result-section {
+  border-radius: 8px;
+  padding: 20px;
+  margin-top: 20px;
+}
+
+.result-section.correct {
+  background: #d1fae5;
+  border: 1px solid #10b981;
+}
+
+.result-section.incorrect {
+  background: #fee2e2;
+  border: 1px solid #ef4444;
+}
+
+.result-header {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+.result-section.correct .result-header {
+  color: #065f46;
+}
+
+.result-section.incorrect .result-header {
+  color: #991b1b;
+}
+
+.correct-answer,
+.explanation {
+  margin-top: 10px;
+  font-family: 'Courier New', monospace;
+}
+
+.correct-answer {
+  color: #991b1b;
+}
+
+.explanation {
+  color: #374151;
+}
+
+.no-selection {
+  text-align: center;
+  padding: 60px 20px;
+  color: #6b7280;
+}
+
+.no-selection h3 {
+  color: #374151;
+  margin-bottom: 10px;
+}
+
+.loading {
+  text-align: center;
+  padding: 40px;
+  color: #6b7280;
+  font-size: 1.1rem;
+}
+
+.error {
+  background: #fee2e2;
+  color: #991b1b;
+  padding: 12px 16px;
+  border-radius: 8px;
+  border: 1px solid #fecaca;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+@media (max-width: 1024px) {
+  .ce-content {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  
+  .equations-grid {
+    max-height: 400px;
+  }
+}
+
+@media (max-width: 768px) {
+  .chemical-equations {
+    padding: 15px;
+  }
+  
+  .ce-header h2 {
+    font-size: 2rem;
+  }
+  
+  .practice-area {
+    padding: 20px;
+  }
+  
+  .button-group {
+    flex-direction: column;
+  }
+  
+  .equation-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+}

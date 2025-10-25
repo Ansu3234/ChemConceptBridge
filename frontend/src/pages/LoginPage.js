@@ -13,6 +13,7 @@ function LoginPage() {
   const [error, setError] = useState('');
   const [emailTouched, setEmailTouched] = useState(false);
   const [passwordTouched, setPasswordTouched] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
 
   // Email validation
   const validateEmail = (value) => {
@@ -25,6 +26,8 @@ function LoginPage() {
   const validatePassword = (value) => {
     if (!value) return 'Password is required';
     if (value.length < 6) return 'Password must be at least 6 characters';
+    if (!/[A-Z]/.test(value)) return 'Password must contain at least one uppercase letter';
+    if (!/[0-9]/.test(value)) return 'Password must contain at least one number';
     return '';
   };
 
@@ -46,14 +49,32 @@ function LoginPage() {
     try {
       const response = await axios.post('http://localhost:5000/api/auth/login', {
         email,
-        password
+        password,
+        rememberMe
       });
       const { token, user } = response.data;
       localStorage.setItem('token', token);
       localStorage.setItem('userName', user.name);
-      navigate('/dashboard');
+      localStorage.setItem('userRole', user.role);
+      const next = user.role === 'admin' ? '/admin-dashboard' : user.role === 'teacher' ? '/teacher-dashboard' : '/student-dashboard';
+      navigate(next);
     } catch (err) {
-      setError(err.response?.data?.message || 'Login failed');
+      // Provide more specific error messages based on error type
+      if (err.response?.status === 400) {
+        if (err.response?.data?.message === 'User not found') {
+          setError('No account found with this email. Please check your email or register.');
+        } else if (err.response?.data?.message === 'Invalid credentials') {
+          setError('Incorrect password. Please try again or reset your password.');
+        } else {
+          setError(err.response?.data?.message || 'Login failed');
+        }
+      } else if (err.response?.status === 500) {
+        setError('Server error. Please try again later.');
+      } else if (err.message === 'Network Error') {
+        setError('Network error. Please check your internet connection.');
+      } else {
+        setError('Login failed. Please try again.');
+      }
     } finally {
       setLoading(false);
     }
@@ -83,10 +104,26 @@ function LoginPage() {
       const { token, user } = response.data;
       localStorage.setItem('token', token);
       localStorage.setItem('userName', user.name);
-      navigate('/dashboard');
+      localStorage.setItem('userRole', user.role);
+      const next = user.role === 'admin' ? '/admin-dashboard' : user.role === 'teacher' ? '/teacher-dashboard' : '/student-dashboard';
+      navigate(next);
     } catch (err) {
       console.error('Google login error:', err);
-      setError('Failed to process Google login. Please try again.');
+      
+      // Provide more specific error messages for Google login failures
+      if (err.code === 'auth/popup-closed-by-user') {
+        setError('Google login was cancelled. Please try again.');
+      } else if (err.code === 'auth/popup-blocked') {
+        setError('Google login popup was blocked. Please allow popups for this site.');
+      } else if (err.code === 'auth/account-exists-with-different-credential') {
+        setError('An account already exists with the same email. Please use a different login method.');
+      } else if (err.response?.status === 500) {
+        setError('Server error while processing Google login. Please try again later.');
+      } else if (err.message === 'Network Error') {
+        setError('Network error. Please check your internet connection.');
+      } else {
+        setError('Failed to process Google login. Please try again.');
+      }
     } finally {
       setLoading(false);
     }
@@ -116,7 +153,7 @@ function LoginPage() {
             onChange={e => setEmail(e.target.value)}
             onBlur={() => setEmailTouched(true)}
             className={emailTouched && validateEmail(email) ? 'input-error' : ''}
-            autoComplete="username"
+            autoComplete="off"
           />
           {emailTouched && validateEmail(email) && (
             <p className="error-message">{validateEmail(email)}</p>
@@ -131,11 +168,27 @@ function LoginPage() {
             onChange={e => setPassword(e.target.value)}
             onBlur={() => setPasswordTouched(true)}
             className={passwordTouched && validatePassword(password) ? 'input-error' : ''}
-            autoComplete="current-password"
+            autoComplete="new-password"
           />
           {passwordTouched && validatePassword(password) && (
             <p className="error-message">{validatePassword(password)}</p>
           )}
+
+          <div className="login-options">
+            <label htmlFor="rememberMe">
+              <input
+                id="rememberMe"
+                type="checkbox"
+                checked={rememberMe}
+                onChange={e => setRememberMe(e.target.checked)}
+              />
+              Remember Me
+            </label>
+          </div>
+
+          <div className="forgot-password-link">
+            <Link to="/forgot-password">Forgot Password?</Link>
+          </div>
 
           {error && <p className="error-message" style={{ marginTop: 10 }}>{error}</p>}
 
@@ -145,7 +198,22 @@ function LoginPage() {
             disabled={loading}
             style={{ marginTop: 20 }}
           >
-            {loading ? 'Authenticating...' : 'Sign In'}
+            {loading ? (
+              <>
+                <span className="spinner" style={{
+                  display: 'inline-block',
+                  width: '16px',
+                  height: '16px',
+                  border: '2px solid rgba(255,255,255,0.3)',
+                  borderRadius: '50%',
+                  borderTopColor: '#fff',
+                  animation: 'spin 0.8s linear infinite',
+                  marginRight: '8px',
+                  verticalAlign: 'middle'
+                }}></span>
+                Authenticating...
+              </>
+            ) : 'Sign In'}
           </button>
 
           <div className="divider"><span>OR</span></div>
@@ -156,7 +224,22 @@ function LoginPage() {
             onClick={handleGoogleLogin}
             disabled={loading}
           >
-            Sign in with Google
+            {loading ? (
+              <>
+                <span className="spinner" style={{
+                  display: 'inline-block',
+                  width: '14px',
+                  height: '14px',
+                  border: '2px solid rgba(52, 73, 94, 0.3)',
+                  borderRadius: '50%',
+                  borderTopColor: '#34495e',
+                  animation: 'spin 0.8s linear infinite',
+                  marginRight: '8px',
+                  verticalAlign: 'middle'
+                }}></span>
+                Connecting...
+              </>
+            ) : 'Sign in with Google'}
           </button>
 
           <div className="register-links">

@@ -1,15 +1,297 @@
 .molecule-animation {
-  width: 100%;
-  height: 100%;
-  position: relative;
-  overflow: hidden;
-  border-radius: 16px;
-  background: rgba(255, 255, 255, 0.1);
-  box-shadow: 0 10px 30px rgba(44, 123, 229, 0.15);
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
-.molecule-animation canvas {
+.ma-header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.ma-header h2 {
+  color: #1e40af;
+  margin-bottom: 8px;
+  font-size: 2.5rem;
+}
+
+.ma-header p {
+  color: #6b7280;
+  font-size: 1.1rem;
+}
+
+.ma-content {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.molecule-selector {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.molecule-selector label {
+  font-weight: 600;
+  color: #374151;
+}
+
+.molecule-select {
+  padding: 8px 16px;
+  border: 2px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 1rem;
+  color: #374151;
+  background: white;
+  cursor: pointer;
+  transition: border-color 0.3s ease;
+}
+
+.molecule-select:focus {
+  outline: none;
+  border-color: #3b82f6;
+}
+
+.molecule-display {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 30px;
+  align-items: start;
+}
+
+.molecule-info {
+  background: white;
+  padding: 24px;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e5e7eb;
+}
+
+.molecule-info h3 {
+  color: #1e40af;
+  margin-bottom: 8px;
+  font-size: 1.8rem;
+}
+
+.formula {
+  font-family: 'Courier New', monospace;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #059669;
+  margin-bottom: 16px;
+  background: #f0fdf4;
+  padding: 8px 12px;
+  border-radius: 6px;
+  display: inline-block;
+}
+
+.description {
+  color: #6b7280;
+  line-height: 1.6;
+  margin-bottom: 20px;
+}
+
+.properties h4 {
+  color: #374151;
+  margin-bottom: 12px;
+  font-size: 1.1rem;
+}
+
+.property-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.property-tag {
+  background: #dbeafe;
+  color: #1e40af;
+  padding: 4px 10px;
+  border-radius: 16px;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+/* 3D Viewer Specific Styles */
+.molecule-visualization {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e5e7eb;
+  overflow: hidden;
+}
+
+.viewer-container {
   width: 100%;
-  height: 100%;
-  display: block;
+  height: 400px;
+  border: none;
+  background: #f8fafc;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.view-controls {
+  margin-top: 20px;
+  border-top: 1px solid #e5e7eb;
+  padding-top: 15px;
+}
+
+.control-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.view-btn {
+  background: #e0f2fe;
+  color: #0369a1;
+  border: none;
+  border-radius: 4px;
+  padding: 8px 16px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.view-btn:hover {
+  background: #bae6fd;
+}
+
+.view-btn.active {
+  background: #0ea5e9;
+  color: white;
+}
+
+.interaction-tip {
+  margin-top: 15px;
+  padding: 10px;
+  background: #fffbeb;
+  border-radius: 6px;
+  border-left: 4px solid #fbbf24;
+}
+
+.interaction-tip p {
+  color: #92400e;
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .molecule-display {
+    grid-template-columns: 1fr;
+  }
+  
+  .ma-header h2 {
+    font-size: 2rem;
+  }
+  
+  .viewer-container {
+    height: 350px;
+  }
+}
+
+.property-tag {
+  background: #dbeafe;
+  color: #1e40af;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.molecule-visualization {
+  background: white;
+  padding: 24px;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e5e7eb;
+}
+
+.viewer-container {
+  background: #f8fafc;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+/* View Controls */
+.view-controls {
+  margin-top: 20px;
+  border-top: 1px solid #e5e7eb;
+  padding-top: 20px;
+}
+
+.view-controls h4 {
+  color: #374151;
+  margin-bottom: 12px;
+  font-size: 1.1rem;
+}
+
+.control-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.view-btn {
+  background: #f3f4f6;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #4b5563;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.view-btn:hover {
+  background: #e5e7eb;
+}
+
+.view-btn.active {
+  background: #dbeafe;
+  border-color: #93c5fd;
+  color: #1e40af;
+}
+
+.interaction-tip {
+  background: #fffbeb;
+  border-left: 4px solid #fbbf24;
+  padding: 8px 12px;
+  border-radius: 4px;
+  margin-top: 12px;
+}
+
+.interaction-tip p {
+  color: #92400e;
+  font-size: 0.875rem;
+  margin: 0;
+}
+
+@media (max-width: 768px) {
+  .molecule-display {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  
+  .molecule-selector {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .property-tags {
+    justify-content: center;
+  }
+  
+  .control-buttons {
+    justify-content: center;
+  }
 }
