@@ -7,26 +7,42 @@ const cors = require("cors");
 
 const app = express();
 
-// Middlewares
-app.use(cors());
+// ====================
+// 🔧 Middleware Setup
+// ====================
 app.use(express.json());
 
-// Routes
+// ✅ CORS Configuration — allow frontend & local dev
+app.use(
+  cors({
+    origin: [
+      "https://frontend-project-1-jlrj.onrender.com", // your deployed frontend
+      "http://localhost:3000", // local development
+    ],
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    credentials: true,
+  })
+);
+
+// ====================
+// 📦 Import Routes
+// ====================
 const authRoutes = require("./routes/auth");
 const quizRoutes = require("./routes/quiz");
 const conceptRoutes = require("./routes/concept");
 const adminRoutes = require("./routes/admin");
 const conceptMapRoutes = require("./routes/conceptMap");
-
 const googleRoutes = require("./routes/google");
 const userRoutes = require("./routes/user");
 const remediationRoutes = require("./routes/remediation");
 const searchRoutes = require("./routes/search");
 const chemicalEquationRoutes = require("./routes/chemicalEquation");
-
 const mlRoutes = require("./routes/mlRoutes");
-app.use("/api/ml", mlRoutes);
 
+// ====================
+// 🚏 API Route Mounting
+// ====================
+app.use("/api/ml", mlRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/quiz", quizRoutes);
 app.use("/api/concept", conceptRoutes);
@@ -38,8 +54,16 @@ app.use("/api/remediation", remediationRoutes);
 app.use("/api/search", searchRoutes);
 app.use("/api/chemical-equations", chemicalEquationRoutes);
 
+// ====================
+// 🧠 Health Check Route
+// ====================
+app.get("/", (req, res) => {
+  res.json({ message: "✅ Backend is live and running!" });
+});
 
-// MongoDB Connection
+// ====================
+// 🛢️ MongoDB Connection
+// ====================
 const mongoURI = process.env.MONGO_URI;
 const port = process.env.PORT || 5000;
 
@@ -49,10 +73,7 @@ if (!mongoURI) {
 }
 
 mongoose
-  .connect(mongoURI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
+  .connect(mongoURI)
   .then(() => {
     console.log("✅ MongoDB connected");
 
