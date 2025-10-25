@@ -1,28 +1,34 @@
 {
-  "name": "chemconcept-bridge",
+  "name": "chemconcept-bridge-frontend",
   "version": "1.0.0",
-  "description": "An AI-powered chemistry learning platform that bridges the gap between abstract chemistry concepts and student understanding. The platform uses adaptive quizzes, misconception detection, visual simulations, and personalized remediation to make learning interactive, engaging, and exam-ready.",
-  "main": "index.js",
-  "directories": {
-    "doc": "docs"
-  },
+  "private": true,
+  "description": "An AI-powered chemistry learning platform that bridges the gap between abstract chemistry concepts and student understanding.",
+  "main": "src/index.js",
   "scripts": {
-    "start": "node index.js",
-    "build": "echo 'No build step needed'"
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/Ansu3234/ChemConceptBridge.git"
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-scripts": "5.0.1"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/Ansu3234/ChemConceptBridge/issues"
-  },
-  "homepage": "https://github.com/Ansu3234/ChemConceptBridge#readme",
   "devDependencies": {
     "@playwright/test": "^1.56.1",
     "@types/node": "^24.9.1"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
   }
 }
