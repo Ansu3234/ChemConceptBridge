@@ -13,6 +13,36 @@ import { useState, useEffect } from 'react';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
+// Protected route component - moved outside to prevent re-renders
+const ProtectedRoute = ({ element, allowedRole }) => {
+  const token = localStorage.getItem('token');
+  
+  if (!token) {
+    return <Navigate to="/login" replace />;
+  }
+  
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    if (payload.role !== allowedRole) {
+      // Redirect to the appropriate dashboard based on role
+      if (payload.role === 'teacher') {
+        return <Navigate to="/teacher-dashboard" replace />;
+      } else if (payload.role === 'student') {
+        return <Navigate to="/student-dashboard" replace />;
+      } else if (payload.role === 'admin') {
+        return <Navigate to="/admin-dashboard" replace />;
+      } else {
+        return <Navigate to="/login" replace />;
+      }
+    }
+    return element;
+  } catch (error) {
+    console.error('Error decoding token:', error);
+    localStorage.removeItem('token');
+    return <Navigate to="/login" replace />;
+  }
+};
+
 function App() {
   const [userRole, setUserRole] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -32,36 +62,6 @@ function App() {
     }
     setLoading(false);
   }, []);
-
-  // Protected route component
-  const ProtectedRoute = ({ element, allowedRole }) => {
-    const token = localStorage.getItem('token');
-    
-    if (!token) {
-      return <Navigate to="/login" replace />;
-    }
-    
-    try {
-      const payload = JSON.parse(atob(token.split('.')[1]));
-      if (payload.role !== allowedRole) {
-        // Redirect to the appropriate dashboard based on role
-        if (payload.role === 'teacher') {
-          return <Navigate to="/teacher-dashboard" replace />;
-        } else if (payload.role === 'student') {
-          return <Navigate to="/student-dashboard" replace />;
-        } else if (payload.role === 'admin') {
-          return <Navigate to="/admin-dashboard" replace />;
-        } else {
-          return <Navigate to="/login" replace />;
-        }
-      }
-      return element;
-    } catch (error) {
-      console.error('Error decoding token:', error);
-      localStorage.removeItem('token');
-      return <Navigate to="/login" replace />;
-    }
-  };
 
   if (loading) {
     return <div>Loading...</div>;

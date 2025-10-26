@@ -6,6 +6,7 @@ import Header from './Header';
 import StudentDashboard from './StudentDashboard';
 import TeacherDashboard from './TeacherDashboard';
 import AdminDashboard from './AdminDashboard';
+import { isTokenExpired, getUserFromToken, clearAuth } from '../../utils/tokenManager';
 
 const Dashboard = () => {
   const [user, setUser] = useState(null);
@@ -16,40 +17,50 @@ const Dashboard = () => {
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (!token) {
-      navigate('/login');
+      console.log('No token found, redirecting to login');
+      navigate('/login', { replace: true });
       return;
     }
 
-    // Decode token to get user info
-    try {
-      const payload = JSON.parse(atob(token.split('.')[1]));
-      setUser({
-        id: payload.id,
-        role: payload.role,
-        name: localStorage.getItem('userName') || 'User'
-      });
-      
-      // Redirect to the appropriate dashboard based on role and current URL
-      const currentPath = window.location.pathname;
-      if (payload.role === 'admin' && currentPath !== '/admin-dashboard') {
-        navigate('/admin-dashboard');
-      } else if (payload.role === 'teacher' && currentPath !== '/teacher-dashboard') {
-        navigate('/teacher-dashboard');
-      } else if (payload.role === 'student' && currentPath !== '/student-dashboard') {
-        navigate('/student-dashboard');
-      }
-    } catch (error) {
-      console.error('Error decoding token:', error);
-      localStorage.removeItem('token');
-      navigate('/login');
+    // Check if token is expired
+    if (isTokenExpired()) {
+      console.log('Token expired, redirecting to login');
+      clearAuth();
+      navigate('/login', { replace: true });
+      return;
     }
+
+    // Get user from token
+    const userData = getUserFromToken();
+    if (!userData) {
+      console.error('Invalid token format');
+      clearAuth();
+      navigate('/login', { replace: true });
+      return;
+    }
+
+    setUser({
+      id: userData.id,
+      role: userData.role,
+      name: localStorage.getItem('userName') || 'User'
+    });
+
+    // Only redirect if role doesn't match the current dashboard
+    const currentPath = window.location.pathname;
+    if (userData.role === 'admin' && currentPath !== '/admin-dashboard') {
+      navigate('/admin-dashboard', { replace: true });
+    } else if (userData.role === 'teacher' && currentPath !== '/teacher-dashboard') {
+      navigate('/teacher-dashboard', { replace: true });
+    } else if (userData.role === 'student' && currentPath !== '/student-dashboard') {
+      navigate('/student-dashboard', { replace: true });
+    }
+
     setLoading(false);
   }, [navigate]);
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('userName');
-    navigate('/');
+    clearAuth();
+    navigate('/', { replace: true });
   };
 
   if (loading || !user) {

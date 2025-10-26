@@ -3,6 +3,7 @@ import './TeacherDashboard.css';
 import api from '../../apiClient';
 import { Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import ContentManagement from './ContentManagement';
 
 // Simple list and create UI for quizzes and concepts + Students tab aggregated from quiz stats
 const TeacherDashboard = ({ activeTab, setActiveTab, user }) => {
@@ -10,6 +11,17 @@ const TeacherDashboard = ({ activeTab, setActiveTab, user }) => {
   const [quizzes, setQuizzes] = useState([]);
   const [concepts, setConcepts] = useState([]);
   const [error, setError] = useState('');
+
+  // Listen for navigation events from ContentManagement
+  useEffect(() => {
+    const handleNavigate = (event) => {
+      if (event.detail && typeof event.detail === 'string') {
+        setActiveTab(event.detail);
+      }
+    };
+    window.addEventListener('navigate-to-tab', handleNavigate);
+    return () => window.removeEventListener('navigate-to-tab', handleNavigate);
+  }, [setActiveTab]);
 
   // Aggregated students derived from attempts on teacher's quizzes
   const [students, setStudents] = useState([]); // [{ id, name, email, attempts, averageScore }]
@@ -822,54 +834,7 @@ const TeacherDashboard = ({ activeTab, setActiveTab, user }) => {
           </div>
         );
       case 'content':
-        return (
-          <div className="dashboard-card">
-            <h3>Content Management</h3>
-            <div style={{ paddingTop: 8 }}>
-              <div className="content-management-grid">
-                <div className="content-section">
-                  <h4>Quick Actions</h4>
-                  <div className="action-buttons">
-                    <button onClick={() => setActiveTab('concepts')} className="action-btn primary">
-                      📚 Manage Concepts
-                    </button>
-                    <button onClick={() => setActiveTab('quizzes')} className="action-btn secondary">
-                      📝 Manage Quizzes
-                    </button>
-                    <button onClick={() => setActiveTab('concept-map')} className="action-btn tertiary">
-                      🗺️ Manage Concept Maps
-                    </button>
-                  </div>
-                </div>
-                <div className="content-section">
-                  <h4>Content Statistics</h4>
-                  <div className="content-stats">
-                    <div className="stat-item">
-                      <span className="stat-label">Total Concepts:</span>
-                      <span className="stat-value">{concepts.filter(c => (c.createdBy?._id || c.createdBy) === user.id).length}</span>
-                    </div>
-                    <div className="stat-item">
-                      <span className="stat-label">Total Quizzes:</span>
-                      <span className="stat-value">{myQuizzes.length}</span>
-                    </div>
-                    <div className="stat-item">
-                      <span className="stat-label">Active Students:</span>
-                      <span className="stat-value">{studentsLoaded ? students.length : '—'}</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        );
-      case 'performance-dashboard':
-        return (
-          <div className="dashboard-card">
-            <div style={{ paddingTop: 8 }}>
-              {React.createElement(require('./TeacherPerformanceDashboard').default, { user })}
-            </div>
-          </div>
-        );
+        return <ContentManagement user={user} />;
       default:
         return renderOverview();
     }

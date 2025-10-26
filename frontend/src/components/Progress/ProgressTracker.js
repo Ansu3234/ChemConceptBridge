@@ -18,7 +18,6 @@ ChartJS.register(
 
 const ProgressTracker = () => {
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
   const [stats, setStats] = useState({
     totalQuizzes: 0,
     accuracy: 0,
@@ -35,7 +34,9 @@ const ProgressTracker = () => {
         setLoading(true);
         const token = localStorage.getItem('token');
         if (!token) {
-          throw new Error('Authentication required');
+          // Don't show error for missing token, just use default stats
+          setLoading(false);
+          return;
         }
         
         const response = await fetch('http://localhost:5000/api/user/stats', {
@@ -46,7 +47,9 @@ const ProgressTracker = () => {
         });
         
         if (!response.ok) {
-          throw new Error('Failed to fetch progress data');
+          // Don't redirect, just show default stats
+          setLoading(false);
+          return;
         }
         
         const data = await response.json();
@@ -61,7 +64,7 @@ const ProgressTracker = () => {
         });
         setLoading(false);
       } catch (err) {
-        setError(err.message);
+        // Silently handle errors without redirecting
         setLoading(false);
       }
     };
@@ -131,26 +134,7 @@ const ProgressTracker = () => {
     );
   }
 
-  if (error) {
-    return (
-      <div className="progress-tracker">
-        <div className="progress-header">
-          <h2>Progress Tracker</h2>
-          <p>Monitor your learning journey and achievements</p>
-        </div>
-        <div className="progress-content">
-          <div className="error-message">
-            <div className="error-icon">⚠️</div>
-            <h3>Error Loading Data</h3>
-            <p>{error}</p>
-            <button className="retry-button" onClick={() => window.location.reload()}>
-              Retry
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  // Removed error display since we're handling errors silently
 
   return (
     <div className="progress-tracker">
