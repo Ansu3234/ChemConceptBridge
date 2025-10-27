@@ -206,7 +206,7 @@ const StudentDashboard = ({ activeTab, setActiveTab }) => {
       case 'quizzes':
         return <QuizEngine />;
       case 'concept-map':
-        return <ConceptMap />;
+        return <ConceptMap role="student" />;
       case 'progress':
         return <ProgressTracker />;
       case 'remediation':

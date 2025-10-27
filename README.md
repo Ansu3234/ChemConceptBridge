@@ -43,6 +43,15 @@ An AI-powered chemistry learning platform that bridges the gap between abstract 
 - **JWT** - JSON Web Tokens for authentication
 - **bcryptjs** - Password hashing
 
+### Machine Learning
+- **Python 3.8+** - Machine learning environment
+- **scikit-learn** - ML algorithms and utilities
+- **pandas** - Data manipulation and analysis
+- **numpy** - Numerical computing
+- **matplotlib** - Data visualization
+- **joblib** - Model serialization
+- **seaborn** - Statistical data visualization
+
 ## 📁 Project Structure
 
 ```
@@ -64,6 +73,13 @@ chemconcept-bridge/
 │   ├── models/                     # Database models
 │   ├── routes/                     # API routes
 │   ├── middleware/                 # Custom middleware
+│   ├── ml/                         # Machine Learning models
+│   │   ├── data_generator.py       # Generate training data
+│   │   ├── train_models.py         # Train all ML models
+│   │   ├── visualize_results.py    # Visualize model performance
+│   │   ├── predict_knn.py          # KNN prediction script
+│   │   ├── knn_model.py            # KNN model training
+│   │   └── requirements.txt        # Python dependencies
 │   └── server.js                   # Server entry point
 └── README.md
 ```
@@ -117,7 +133,22 @@ chemconcept-bridge/
    npm start
    ```
 
-6. **Access the application**
+6. **Machine Learning Setup (Optional)**
+   
+   Install Python dependencies:
+   ```bash
+   cd backend/ml
+   pip install -r requirements.txt
+   ```
+   
+   Generate training data and train models:
+   ```bash
+   python data_generator.py    # Generate synthetic student data
+   python train_models.py      # Train all ML models
+   python visualize_results.py # Generate comparison charts
+   ```
+
+7. **Access the application**
    - Frontend: http://localhost:3000
    - Backend API: http://localhost:5000
 
@@ -167,6 +198,60 @@ chemconcept-bridge/
 - Energy changes and enthalpy
 - Entropy and free energy
 - Spontaneous processes
+
+## 🤖 Machine Learning Models
+
+The platform includes comprehensive ML models for predicting student performance. Five different algorithms are implemented and compared:
+
+### Implemented Models
+
+1. **K-Nearest Neighbors (KNN)**
+   - Instance-based learning algorithm
+   - Classifies based on similarity to k nearest neighbors
+   - Simple and intuitive approach
+
+2. **Naive Bayes Classifier**
+   - Probabilistic classifier based on Bayes' theorem
+   - Assumes feature independence
+   - Fast training and prediction
+
+3. **Decision Tree**
+   - Tree-based learning algorithm
+   - Makes decisions through hierarchical rules
+   - Highly interpretable
+
+4. **Support Vector Machine (SVM)**
+   - Margin-maximization algorithm
+   - Uses RBF kernel for non-linear classification
+   - Robust to overfitting
+
+5. **Backpropagation Neural Network**
+   - Multi-layer perceptron with backpropagation
+   - Hidden layers: [100, 50] neurons
+   - Can capture complex non-linear patterns
+
+### Model Evaluation Metrics
+
+All models are evaluated using:
+- **Accuracy**: Overall correctness
+- **Precision**: True positive rate among predicted positives
+- **Recall**: True positive rate among actual positives
+- **F1-Score**: Harmonic mean of precision and recall
+
+### Training Process
+
+1. **Data Generation**: Creates synthetic student performance data (500 samples)
+2. **Model Training**: Trains all 5 models on the dataset
+3. **Evaluation**: Compares models using multiple metrics
+4. **Visualization**: Generates comparison charts and radar plots
+
+### Model Usage
+
+The best-performing model can be used for:
+- Predicting student performance categories (weak/average/strong)
+- Early intervention recommendations
+- Personalized learning paths
+- Performance risk assessment
 
 ## 🔧 API Endpoints
 

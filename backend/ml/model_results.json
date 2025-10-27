@@ -1,0 +1,37 @@
+[
+  {
+    "model": "KNN",
+    "accuracy": 76.0,
+    "precision": 77.26,
+    "recall": 76.0,
+    "f1_score": 71.19
+  },
+  {
+    "model": "Naive Bayes",
+    "accuracy": 83.0,
+    "precision": 86.28,
+    "recall": 83.0,
+    "f1_score": 80.36
+  },
+  {
+    "model": "Decision Tree",
+    "accuracy": 83.0,
+    "precision": 85.65,
+    "recall": 83.0,
+    "f1_score": 83.85
+  },
+  {
+    "model": "SVM",
+    "accuracy": 71.0,
+    "precision": 50.41,
+    "recall": 71.0,
+    "f1_score": 58.96
+  },
+  {
+    "model": "Neural Network",
+    "accuracy": 71.0,
+    "precision": 50.41,
+    "recall": 71.0,
+    "f1_score": 58.96
+  }
+]

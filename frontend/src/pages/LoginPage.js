@@ -154,7 +154,10 @@ function LoginPage() {
             autoComplete="off"
           />
 
-          <label>Password</label>
+          <div className="password-label-row">
+            <label>Password</label>
+            <Link to="/forgot-password" className="forgot-password-link">Forgot Password?</Link>
+          </div>
           <input
             type="password"
             placeholder="Enter your password"

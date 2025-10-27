@@ -169,6 +169,7 @@ const TeacherConceptMapManager = () => {
             nodes={form.nodes}
             links={form.links}
             onChange={({ nodes, links }) => setForm({ ...form, nodes, links })}
+            role="teacher"
           />
         </div>
 
