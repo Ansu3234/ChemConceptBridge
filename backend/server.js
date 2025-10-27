@@ -16,7 +16,7 @@ app.use(express.json());
 app.use(
   cors({
     origin: [
-      "https://frontend-project-1-jlrj.onrender.com", // your deployed frontend
+      "https://frontend-project-1-1jlrj.onrender.com", // your deployed frontend
       "http://localhost:3000", // local development
     ],
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
