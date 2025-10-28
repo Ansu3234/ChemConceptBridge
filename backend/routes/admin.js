@@ -6,6 +6,7 @@ const Quiz = require("../models/Quiz");
 const ConceptMap = require("../models/ConceptMap");
 const auth = require("../middleware/authMiddleware");
 const allow = require("../middleware/roleMiddleware");
+const SystemSettings = require("../models/SystemSettings");
 
 const router = express.Router();
 
@@ -166,6 +167,44 @@ router.get("/summary", async (req, res) => {
         hard: quizDifficultyCounts.hard
       }
     });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// =====================
+// System Settings APIs
+// =====================
+router.get("/system-settings", async (req, res) => {
+  try {
+    const settings = await SystemSettings.getSingleton();
+    res.json(settings);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+router.put("/system-settings", async (req, res) => {
+  try {
+    const allowed = [
+      "maintenanceMode",
+      "allowRegistration",
+      "conceptMapEnabled",
+      "analyticsEnabled",
+      "chemicalEquationsEnabled"
+    ];
+
+    const update = {};
+    for (const key of allowed) {
+      if (typeof req.body[key] !== "undefined") {
+        update[key] = !!req.body[key];
+      }
+    }
+
+    const settings = await SystemSettings.getSingleton();
+    Object.assign(settings, update);
+    await settings.save();
+    res.json(settings);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

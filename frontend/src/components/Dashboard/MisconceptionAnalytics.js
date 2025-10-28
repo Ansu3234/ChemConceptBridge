@@ -8,10 +8,6 @@ const MisconceptionAnalytics = () => {
   const [error, setError] = useState('');
   const [timeRange, setTimeRange] = useState('30d');
 
-  useEffect(() => {
-    loadAnalytics();
-  }, [timeRange, loadAnalytics]);
-
   const loadAnalytics = useCallback(async () => {
     try {
       setLoading(true);
@@ -26,6 +22,10 @@ const MisconceptionAnalytics = () => {
       setLoading(false);
     }
   }, [timeRange]);
+
+  useEffect(() => {
+    loadAnalytics();
+  }, [timeRange, loadAnalytics]);
 
   const getCategoryColor = (category) => {
     const colors = {

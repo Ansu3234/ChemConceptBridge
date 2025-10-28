@@ -1,6 +1,6 @@
 
 import React, { useEffect, useRef, useState } from "react";
-import axios from "axios";
+import api from "../apiClient";
 import { useNavigate, Link } from "react-router-dom";
 import "./RegisterPage.css";
 
@@ -42,7 +42,7 @@ function RegisterPage() {
       if (/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(value)) {
         try {
           setEmailChecking(true);
-          const res = await axios.post("http://localhost:5000/api/auth/check-email", { email: value });
+          const res = await api.post("/auth/check-email", { email: value });
           setEmailExists(!!res.data?.exists);
         } catch (err) {
           setEmailExists(false);
@@ -86,9 +86,9 @@ function RegisterPage() {
     }
     setLoading(true);
     try {
-      await axios.post("http://localhost:5000/api/auth/register", { name, email, password });
+      await api.post(`/auth/register`, { name, email, password });
       // Auto-login
-      const loginRes = await axios.post("http://localhost:5000/api/auth/login", { email, password });
+      const loginRes = await api.post(`/auth/login`, { email, password });
       const token = loginRes.data.token;
       localStorage.setItem("token", token);
       navigate("/dashboard");
@@ -182,8 +182,7 @@ function RegisterPage() {
           <button
             type="submit"
             className="register-btn"
-            disabled={loading}
-          disabled={loading || emailChecking || emailExists || !!validateEmail(email)}
+            disabled={loading || emailChecking || emailExists || !!validateEmail(email)}
           >
             {loading ? 'Registering...' : (emailExists ? 'Email Already Registered' : 'Create Account')}
           </button>

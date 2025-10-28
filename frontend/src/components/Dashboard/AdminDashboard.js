@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import './AdminDashboard.css';
 import AdminUsers from './AdminUsers';
 import AdminConcepts from './AdminConcepts';
 import AdminQuizzes from './AdminQuizzes';
 import AdminAnalytics from './AdminAnalytics';
 import MisconceptionAnalytics from './MisconceptionAnalytics';
+import AdminSystemSettings from './AdminSystemSettings';
 import api from '../../apiClient';
 import { toast } from 'react-toastify';
 
@@ -12,6 +13,9 @@ const AdminDashboard = ({ activeTab, setActiveTab }) => {
   const [counts, setCounts] = useState({ users: '—', concepts: '—', quizzes: '—', students: '—', teachers: '—' });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [reportsData, setReportsData] = useState({ summary: null, users: { admin: 0, teacher: 0, student: 0 }, concepts: [], quizzes: [] });
+  const [reportsLoading, setReportsLoading] = useState(false);
+  const [reportsError, setReportsError] = useState('');
 
   const fetchDashboardData = async () => {
     setLoading(true);
@@ -41,6 +45,42 @@ const AdminDashboard = ({ activeTab, setActiveTab }) => {
 
   useEffect(() => {
     fetchDashboardData();
+  }, []);
+
+  useEffect(() => {
+    if (activeTab === 'reports') {
+      loadReports();
+    }
+  }, [activeTab]);
+
+  const loadReports = useCallback(async () => {
+    setReportsLoading(true);
+    setReportsError('');
+    try {
+      const [summaryRes, usersRes, quizzesRes, conceptsRes] = await Promise.all([
+        api.get('/admin/summary'),
+        api.get('/admin/analytics/users-by-role'),
+        api.get('/quiz'),
+        api.get('/concept')
+      ]);
+      setReportsData({
+        summary: summaryRes?.data || null,
+        users: {
+          admin: usersRes?.data?.admin || 0,
+          teacher: usersRes?.data?.teacher || 0,
+          student: usersRes?.data?.student || 0
+        },
+        quizzes: quizzesRes?.data || [],
+        concepts: conceptsRes?.data || []
+      });
+    } catch (e) {
+      const message = e?.response?.data?.message || 'Failed to load reports';
+      setReportsError(message);
+      toast.error(message);
+      setReportsData({ summary: null, users: { admin: 0, teacher: 0, student: 0 }, concepts: [], quizzes: [] });
+    } finally {
+      setReportsLoading(false);
+    }
   }, []);
 
   const renderOverview = () => (
@@ -156,9 +196,135 @@ const AdminDashboard = ({ activeTab, setActiveTab }) => {
           </div>
         );
       case 'system':
-        return <div className="coming-soon">System Settings - Coming Soon</div>;
+        return (
+          <div className="tab-content">
+            <AdminSystemSettings />
+          </div>
+        );
       case 'reports':
-        return <div className="coming-soon">Reports - Coming Soon</div>;
+        return (
+          <div className="reports-section">
+            <div className="reports-header">
+              <div>
+                <h2>Reports</h2>
+                <p>Comprehensive performance insights across users, content, and engagement.</p>
+              </div>
+              <button className="refresh-btn" onClick={loadReports} disabled={reportsLoading}>
+                {reportsLoading ? 'Loading…' : 'Refresh Reports'}
+              </button>
+            </div>
+
+            {reportsError && <div className="error-message">{reportsError}</div>}
+
+            {reportsLoading ? (
+              <div className="loading-spinner">Loading reports...</div>
+            ) : (
+              <>
+                <div className="reports-grid">
+                  <div className="reports-card">
+                    <h3>User Distribution</h3>
+                    <div className="reports-grid-cols">
+                      <div className="reports-stat">
+                        <span className="reports-stat-label">Admins</span>
+                        <span className="reports-stat-value">{reportsData.users.admin}</span>
+                      </div>
+                      <div className="reports-stat">
+                        <span className="reports-stat-label">Teachers</span>
+                        <span className="reports-stat-value">{reportsData.users.teacher}</span>
+                      </div>
+                      <div className="reports-stat">
+                        <span className="reports-stat-label">Students</span>
+                        <span className="reports-stat-value">{reportsData.users.student}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="reports-card">
+                    <h3>Concept Overview</h3>
+                    <div className="reports-grid-cols">
+                      <div className="reports-stat">
+                        <span className="reports-stat-label">Total Concepts</span>
+                        <span className="reports-stat-value">{reportsData.summary?.concepts?.total || 0}</span>
+                      </div>
+                      <div className="reports-stat">
+                        <span className="reports-stat-label">Approved & Active</span>
+                        <span className="reports-stat-value">{reportsData.summary?.concepts?.approvedActive || 0}</span>
+                      </div>
+                      <div className="reports-stat">
+                        <span className="reports-stat-label">Pending</span>
+                        <span className="reports-stat-value">{reportsData.summary?.conceptsByStatus?.pending || 0}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="reports-card">
+                    <h3>Quiz Overview</h3>
+                    <div className="reports-grid-cols">
+                      <div className="reports-stat">
+                        <span className="reports-stat-label">Total Quizzes</span>
+                        <span className="reports-stat-value">{reportsData.summary?.quizzes?.total || 0}</span>
+                      </div>
+                      <div className="reports-stat">
+                        <span className="reports-stat-label">Active Quizzes</span>
+                        <span className="reports-stat-value">{reportsData.summary?.quizzes?.active || 0}</span>
+                      </div>
+                      <div className="reports-stat">
+                        <span className="reports-stat-label">Hard Difficulty</span>
+                        <span className="reports-stat-value">{reportsData.summary?.quizzesByDifficulty?.hard || 0}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="reports-table-container">
+                  <div className="reports-table">
+                    <h3>Latest Concepts</h3>
+                    <table>
+                      <thead>
+                        <tr>
+                          <th>Title</th>
+                          <th>Status</th>
+                          <th>Updated</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {reportsData.concepts.slice(0, 5).map((concept) => (
+                          <tr key={concept._id}>
+                            <td>{concept.title}</td>
+                            <td>{concept.status}</td>
+                            <td>{new Date(concept.updatedAt).toLocaleDateString()}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+
+                  <div className="reports-table">
+                    <h3>Latest Quizzes</h3>
+                    <table>
+                      <thead>
+                        <tr>
+                          <th>Title</th>
+                          <th>Difficulty</th>
+                          <th>Updated</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {reportsData.quizzes.slice(0, 5).map((quiz) => (
+                          <tr key={quiz._id}>
+                            <td>{quiz.title}</td>
+                            <td>{quiz.difficulty}</td>
+                            <td>{new Date(quiz.updatedAt).toLocaleDateString()}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
+        );
       default:
         return renderOverview();
     }

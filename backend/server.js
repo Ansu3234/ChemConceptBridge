@@ -1,4 +1,6 @@
-// server.js
+// ====================
+// 🌍 server.js
+// ====================
 require("dotenv").config(); // Load environment variables first
 
 const express = require("express");
@@ -12,15 +14,16 @@ const app = express();
 // ====================
 app.use(express.json());
 
-// ✅ CORS Configuration — allow frontend & local dev
+// ✅ CORS — Allow React frontend (ports 3000 & 3003)
 app.use(
   cors({
     origin: [
-      "https://frontend-project-1-1jlrj.onrender.com", // your deployed frontend
-      "http://localhost:3000", // local development
+      "http://localhost:3000", // Default React dev server
+      "http://localhost:3003", // Custom dev port
     ],
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
 
@@ -48,7 +51,7 @@ app.use("/api/quiz", quizRoutes);
 app.use("/api/concept", conceptRoutes);
 app.use("/api/concept-map", conceptMapRoutes);
 app.use("/api/admin", adminRoutes);
-app.use("/api/auth", googleRoutes);
+app.use("/api/google", googleRoutes); // ✅ fixed duplicate "/api/auth"
 app.use("/api/user", userRoutes);
 app.use("/api/remediation", remediationRoutes);
 app.use("/api/search", searchRoutes);

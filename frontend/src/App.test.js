@@ -1,6 +1,8 @@
 import { render, screen } from '@testing-library/react';
 import React from 'react';
 
+import App from './App';
+
 // Virtual mock to bypass resolving ESM react-router-dom in CRA's Jest
 jest.mock(
   'react-router-dom',
@@ -23,8 +25,6 @@ jest.mock('./pages/ForgotPassword', () => () => <div>Forgot Password</div>);
 jest.mock('./pages/ResetPassword', () => () => <div>Reset Password</div>);
 jest.mock('./pages/QuizStatsPage', () => () => <div>Quiz Stats</div>);
 jest.mock('./pages/StudentProgressPage', () => () => <div>Student Progress</div>);
-
-import App from './App';
 
 test('renders homepage brand text', () => {
   render(<App />);
