@@ -1,3 +1,4 @@
+import os
 import matplotlib.pyplot as plt
 import pandas as pd
 import json
@@ -143,8 +144,8 @@ output_file = 'model_comparison_charts.png'
 plt.savefig(output_file, dpi=300, bbox_inches='tight')
 print(f"\n[OK] Visualization saved to: {output_file}")
 
-# Display the plot
-plt.show()
+if os.environ.get("DISPLAY") or os.environ.get("MATPLOTLIB_SHOW") == "1":
+    plt.show()
 
 print("\n" + "=" * 80)
 print("VISUALIZATION COMPLETE")

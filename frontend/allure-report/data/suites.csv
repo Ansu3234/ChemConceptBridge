@@ -1,0 +1,2 @@
+"DESCRIPTION","DURATION IN MS","NAME","PARENT SUITE","START TIME","STATUS","STOP TIME","SUB SUITE","SUITE","TEST CLASS","TEST METHOD"
+"","7908","should validate email format","chromium","Tue Nov 11 20:25:03 IST 2025","failed","Tue Nov 11 20:25:11 IST 2025","Authentication Flow Tests > Login Flow","auth.spec.js","",""

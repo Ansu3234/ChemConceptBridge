@@ -71,7 +71,7 @@ const DEFAULT_MAPS = {
   }
 };
 
-const ConceptMap = ({ nodes: propNodes = [], links: propLinks = [], onChange, role }) => {
+const ConceptMap = ({ nodes: propNodes = [], links: propLinks = [], onChange, role, hideTitle = false, description }) => {
   const defaultData = useMemo(() => {
     if (!role || !DEFAULT_MAPS[role]) return { nodes: [], links: [] };
     const source = DEFAULT_MAPS[role];
@@ -98,31 +98,43 @@ const ConceptMap = ({ nodes: propNodes = [], links: propLinks = [], onChange, ro
   const [selectedLinkIdx, setSelectedLinkIdx] = useState(null);
   const svgRef = useRef();
   const heading = role ? `${role.charAt(0).toUpperCase()}${role.slice(1)} Concept Map` : 'Concept Map';
+  const updateSourceRef = useRef('idle');
 
   useEffect(() => {
+    // Always update when propNodes change (for topic-specific maps)
     if (Array.isArray(propNodes) && propNodes.length) {
-      setNodes(propNodes);
+      updateSourceRef.current = 'props';
+      setNodes(propNodes.map(n => ({ ...n }))); // Create new objects to force update
     } else if (!Array.isArray(propNodes) && defaultData.nodes.length) {
-      setNodes(defaultData.nodes);
-    } else if (Array.isArray(propNodes) && !propNodes.length && defaultData.nodes.length && nodes.length === 0) {
-      setNodes(defaultData.nodes);
+      updateSourceRef.current = 'props';
+      setNodes(defaultData.nodes.map(n => ({ ...n })));
+    } else if (Array.isArray(propNodes) && !propNodes.length && defaultData.nodes.length) {
+      updateSourceRef.current = 'props';
+      setNodes(defaultData.nodes.map(n => ({ ...n })));
     }
-  }, [propNodes, defaultData, nodes.length]);
+  }, [propNodes, defaultData]);
+  
   useEffect(() => {
+    // Always update when propLinks change (for topic-specific maps)
     if (Array.isArray(propLinks) && propLinks.length) {
-      setLinks(propLinks);
+      updateSourceRef.current = 'props';
+      setLinks(propLinks.map(l => ({ ...l }))); // Create new objects to force update
     } else if (!Array.isArray(propLinks) && defaultData.links.length) {
-      setLinks(defaultData.links);
-    } else if (Array.isArray(propLinks) && !propLinks.length && defaultData.links.length && links.length === 0) {
-      setLinks(defaultData.links);
+      updateSourceRef.current = 'props';
+      setLinks(defaultData.links.map(l => ({ ...l })));
+    } else if (Array.isArray(propLinks) && !propLinks.length && defaultData.links.length) {
+      updateSourceRef.current = 'props';
+      setLinks(defaultData.links.map(l => ({ ...l })));
     }
-  }, [propLinks, defaultData, links.length]);
+  }, [propLinks, defaultData]);
 
   // Notify parent when state changes
   useEffect(() => {
-    if (typeof onChange === 'function') onChange({ nodes, links });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [nodes, links]);
+    if (typeof onChange === 'function' && updateSourceRef.current === 'user') {
+      onChange({ nodes, links });
+      updateSourceRef.current = 'idle';
+    }
+  }, [nodes, links, onChange]);
 
   const handleMouseDown = (e, node) => {
     setDraggedNode(node.id);
@@ -133,6 +145,7 @@ const ConceptMap = ({ nodes: propNodes = [], links: propLinks = [], onChange, ro
 
   const handleMouseMove = (e) => {
     if (!draggedNode) return;
+    updateSourceRef.current = 'user';
     setNodes((curr) => curr.map((n) => (
       n.id === draggedNode ? { ...n, x: e.clientX - offset.x, y: e.clientY - offset.y } : n
     )));
@@ -142,6 +155,7 @@ const ConceptMap = ({ nodes: propNodes = [], links: propLinks = [], onChange, ro
 
   const addNode = () => {
     const newId = nodes.length ? Math.max(...nodes.map(n => n.id)) + 1 : 1;
+    updateSourceRef.current = 'user';
     setNodes([...nodes, { id: newId, label: `Concept ${newId}`, x: 200, y: 200 }]);
   };
 
@@ -153,6 +167,7 @@ const ConceptMap = ({ nodes: propNodes = [], links: propLinks = [], onChange, ro
       return;
     }
     if (linkFrom !== id) {
+      updateSourceRef.current = 'user';
       setLinks((curr) => [...curr, { from: linkFrom, to: id }]);
     }
     setLinkFrom(null);
@@ -165,25 +180,30 @@ const ConceptMap = ({ nodes: propNodes = [], links: propLinks = [], onChange, ro
 
   const deleteSelected = () => {
     if (selectedNodeId != null) {
+      updateSourceRef.current = 'user';
       setLinks(links.filter(l => l.from !== selectedNodeId && l.to !== selectedNodeId));
       setNodes(nodes.filter(n => n.id !== selectedNodeId));
       setSelectedNodeId(null);
     } else if (selectedLinkIdx != null) {
+      updateSourceRef.current = 'user';
       setLinks(links.filter((_, i) => i !== selectedLinkIdx));
       setSelectedLinkIdx(null);
     }
   };
 
   const renameNode = (id, label) => {
+    updateSourceRef.current = 'user';
     setNodes(nodes.map(n => n.id === id ? { ...n, label } : n));
   };
 
   const resetToDefault = () => {
     if (!defaultData.nodes.length && !defaultData.links.length) {
+      updateSourceRef.current = 'user';
       setNodes([]);
       setLinks([]);
       return;
     }
+    updateSourceRef.current = 'user';
     setNodes(defaultData.nodes.map((item) => ({ ...item })));
     setLinks(defaultData.links.map((item) => ({ ...item })));
     setSelectedNodeId(null);
@@ -208,8 +228,8 @@ const ConceptMap = ({ nodes: propNodes = [], links: propLinks = [], onChange, ro
   return (
     <div className="concept-map">
       <div className="concept-map-header">
-        <h2>{heading}</h2>
-        <p>Drag to rearrange, edit labels inline, select two nodes to connect them.</p>
+        {!hideTitle && <h2>{heading}</h2>}
+        <p>{description || 'Drag to rearrange, edit labels inline, select two nodes to connect them.'}</p>
         <button className="add-node-btn" onClick={addNode}>+ Add Concept</button>
         <button onClick={deleteSelected} disabled={selectedNodeId == null && selectedLinkIdx == null}>Delete Selected</button>
         <button onClick={resetToDefault}>Reset</button>

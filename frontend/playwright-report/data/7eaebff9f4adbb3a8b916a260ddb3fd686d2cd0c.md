@@ -1,0 +1,115 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e2]:
+  - region "Notifications Alt+T"
+  - generic [ref=e3]:
+    - generic [ref=e4]:
+      - generic [ref=e6]:
+        - generic [ref=e7]: 🧪
+        - generic [ref=e8]: ChemConcept Bridge
+      - generic [ref=e9]:
+        - generic [ref=e10]:
+          - generic [ref=e11]: T
+          - generic [ref=e12]:
+            - generic [ref=e13]: Tessa
+            - generic [ref=e14]: Student
+        - navigation [ref=e15]:
+          - button "📊 Overview" [ref=e16] [cursor=pointer]:
+            - generic [ref=e17]: 📊
+            - generic [ref=e18]: Overview
+          - button "🧪 Concepts" [ref=e19] [cursor=pointer]:
+            - generic [ref=e20]: 🧪
+            - generic [ref=e21]: Concepts
+          - button "📝 Quizzes" [ref=e22] [cursor=pointer]:
+            - generic [ref=e23]: 📝
+            - generic [ref=e24]: Quizzes
+          - button "📈 Progress" [ref=e25] [cursor=pointer]:
+            - generic [ref=e26]: 📈
+            - generic [ref=e27]: Progress
+          - button "🗺️ Concept Map" [ref=e28] [cursor=pointer]:
+            - generic [ref=e29]: 🗺️
+            - generic [ref=e30]: Concept Map
+          - button "🔧 Remediation" [ref=e31] [cursor=pointer]:
+            - generic [ref=e32]: 🔧
+            - generic [ref=e33]: Remediation
+          - button "📏 Confidence Meter" [ref=e34] [cursor=pointer]:
+            - generic [ref=e35]: 📏
+            - generic [ref=e36]: Confidence Meter
+          - button "⚛️ Molecule Animation" [ref=e37] [cursor=pointer]:
+            - generic [ref=e38]: ⚛️
+            - generic [ref=e39]: Molecule Animation
+          - button "🧮 Chemistry Calculator" [ref=e40] [cursor=pointer]:
+            - generic [ref=e41]: 🧮
+            - generic [ref=e42]: Chemistry Calculator
+          - button "📅 Periodic Table" [ref=e43] [cursor=pointer]:
+            - generic [ref=e44]: 📅
+            - generic [ref=e45]: Periodic Table
+          - button "⚗️ Chemical Equations" [ref=e46] [cursor=pointer]:
+            - generic [ref=e47]: ⚗️
+            - generic [ref=e48]: Chemical Equations
+          - button "🏆 Leaderboard" [ref=e49] [cursor=pointer]:
+            - generic [ref=e50]: 🏆
+            - generic [ref=e51]: Leaderboard
+          - button "📊 Performance" [ref=e52] [cursor=pointer]:
+            - generic [ref=e53]: 📊
+            - generic [ref=e54]: Performance
+      - button "🚪 Logout" [ref=e56] [cursor=pointer]:
+        - generic [ref=e57]: 🚪
+        - generic [ref=e58]: Logout
+    - generic [ref=e59]:
+      - banner [ref=e60]:
+        - generic [ref=e61]:
+          - generic [ref=e62]:
+            - heading "Good Evening, Tessa!" [level=1] [ref=e63]
+            - paragraph [ref=e64]: Ready to explore chemistry concepts?
+          - generic [ref=e66]:
+            - textbox "Search concepts, quizzes..." [ref=e68]
+            - button "🎤" [ref=e69] [cursor=pointer]:
+              - generic [ref=e70]: 🎤
+            - button "🔔 3" [ref=e71] [cursor=pointer]:
+              - generic [ref=e72]: 🔔
+              - generic [ref=e73]: "3"
+            - button "⚙️" [ref=e74] [cursor=pointer]:
+              - generic [ref=e75]: ⚙️
+            - generic [ref=e76] [cursor=pointer]:
+              - generic [ref=e77]: T
+              - generic [ref=e78]:
+                - generic [ref=e79]: Tessa
+                - generic [ref=e80]: Student
+      - generic [ref=e82]:
+        - generic [ref=e83]:
+          - heading "Good Evening, Tessa!" [level=2] [ref=e84]
+          - paragraph [ref=e85]: Ready to explore chemistry concepts?
+        - generic [ref=e87]:
+          - generic [ref=e88]:
+            - heading "Quiz Results" [level=2] [ref=e89]
+            - generic [ref=e90]:
+              - generic [ref=e92]: 0%
+              - heading "Great job!" [level=3] [ref=e93]
+              - paragraph [ref=e94]: You answered 1 out of 1 questions
+            - generic [ref=e95]: Detailed answer review is hidden to prevent sharing of answer keys. Focus on the recommended next steps below.
+            - generic [ref=e96]:
+              - button "Take Another Quiz" [ref=e97] [cursor=pointer]
+              - button "Review Answers" [ref=e98] [cursor=pointer]
+          - generic [ref=e99]:
+            - heading "Recommended next steps" [level=3] [ref=e100]
+            - generic [ref=e101]:
+              - generic [ref=e102]:
+                - heading "🧠 AI-Powered Remediation Module" [level=2] [ref=e103]
+                - paragraph [ref=e104]: Personalized learning resources based on detected misconceptions
+                - generic [ref=e105]:
+                  - generic [ref=e106]:
+                    - generic [ref=e107]: "0"
+                    - text: Misconceptions Detected
+                  - generic [ref=e108]:
+                    - generic [ref=e109]: "0"
+                    - text: High Priority
+                  - generic [ref=e110]:
+                    - generic [ref=e111]: "0"
+                    - text: Resources Available
+              - generic [ref=e113]:
+                - generic [ref=e114]: 🎉
+                - heading "Great job!" [level=3] [ref=e115]
+                - paragraph [ref=e116]: No misconceptions detected. Keep up the excellent work!
+```

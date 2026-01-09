@@ -3,8 +3,37 @@ const Quiz = require("../models/Quiz");
 const QuizAttempt = require("../models/QuizAttempt");
 const auth = require("../middleware/authMiddleware");
 const Gamification = require("../models/Gamification");
+const UserProgress = require("../models/UserProgress");
+const { checkBadgeUnlocks, getQuizXp } = require("../utils/badgeDefinitions");
 
 const router = express.Router();
+
+// Helper function to normalize question text for deduplication
+const normalizeQuestionText = (text) => {
+  if (!text || typeof text !== 'string') return '';
+  return text.trim().replace(/\s+/g, ' ').toLowerCase();
+};
+
+// Helper function to remove duplicate questions from an array
+const removeDuplicateQuestions = (questions) => {
+  if (!Array.isArray(questions)) return [];
+  
+  const uniqueQuestions = [];
+  const seenQuestions = new Map();
+  
+  questions.forEach(q => {
+    if (!q || !q.question) return;
+    
+    const normalizedText = normalizeQuestionText(q.question);
+    
+    if (normalizedText && !seenQuestions.has(normalizedText)) {
+      seenQuestions.set(normalizedText, true);
+      uniqueQuestions.push(q);
+    }
+  });
+  
+  return uniqueQuestions;
+};
 
 // Get all quizzes
 router.get("/", async (req, res) => {
@@ -22,7 +51,32 @@ router.get("/", async (req, res) => {
     const quizzes = quizzesDocs.map(q => {
       const o = q.toObject();
       if (Array.isArray(o.questions)) {
-        o.questions = o.questions.map(qq => ({ _id: qq._id, question: qq.question, options: qq.options }));
+        // Remove duplicates when returning quizzes (use question text as primary key)
+        const uniqueQuestions = [];
+        const seenQuestions = new Map(); // Map to track first occurrence
+        
+        o.questions.forEach(qq => {
+          if (!qq || !qq.question) return;
+          
+          const normalizedText = normalizeQuestionText(qq.question);
+          
+          // Only add if we haven't seen this exact question text before
+          if (normalizedText && !seenQuestions.has(normalizedText)) {
+            seenQuestions.set(normalizedText, true);
+            uniqueQuestions.push({ 
+              _id: qq._id, 
+              question: qq.question, 
+              options: qq.options 
+            });
+          }
+        });
+        
+        o.questions = uniqueQuestions;
+        
+        // Log if duplicates were removed
+        if (uniqueQuestions.length < q.questions.length) {
+          console.log(`Removed ${q.questions.length - uniqueQuestions.length} duplicate(s) from quiz "${q.title}"`);
+        }
       }
       return o;
     });
@@ -45,12 +99,27 @@ router.get("/:id", async (req, res) => {
     // Do not leak answer keys to clients other than creator/admin
     const sanitized = quiz.toObject();
     if (Array.isArray(sanitized.questions)) {
-      sanitized.questions = sanitized.questions.map(q => ({
-        _id: q._id,
-        question: q.question,
-        options: q.options,
-        // hide correct index and explanation until after attempt
-      }));
+      // Remove duplicates when returning quiz
+      const uniqueQuestions = [];
+      const seenQuestions = new Set();
+      
+      sanitized.questions.forEach(q => {
+        if (!q || !q.question) return;
+        
+      const normalizedText = normalizeQuestionText(q.question);
+      
+      if (normalizedText && !seenQuestions.has(normalizedText)) {
+        seenQuestions.add(normalizedText);
+        uniqueQuestions.push({
+          _id: q._id,
+          question: q.question,
+          options: q.options,
+          // hide correct index and explanation until after attempt
+        });
+      }
+      });
+      
+      sanitized.questions = uniqueQuestions;
     }
     
     res.json(sanitized);
@@ -91,8 +160,19 @@ router.post("/", auth, async (req, res) => {
       }
     }
 
+    // Remove duplicate questions within the same quiz
+    const uniqueQuestions = removeDuplicateQuestions(questions);
+
+    if (uniqueQuestions.length === 0) {
+      return res.status(400).json({ message: "All questions are duplicates. Please provide unique questions." });
+    }
+
+    if (uniqueQuestions.length < questions.length) {
+      console.log(`Removed ${questions.length - uniqueQuestions.length} duplicate questions from quiz creation`);
+    }
+
     const quiz = new Quiz({
-      title, description, topic, difficulty, duration, questions,
+      title, description, topic, difficulty, duration, questions: uniqueQuestions,
       createdBy: req.user.id
     });
 
@@ -183,33 +263,92 @@ router.post("/:id/attempt", auth, async (req, res) => {
     quiz.averageScore = ((quiz.averageScore * (quiz.attempts - 1)) + score) / quiz.attempts;
     await quiz.save();
 
-    // Simple gamification: award XP and basic badges
+    // Enhanced gamification: award XP based on difficulty and score
     try {
-      const deltaXp = 10 + Math.round(score / 10); // base 10 + up to 10 by performance
-      const gam = await Gamification.findOneAndUpdate(
-        { user: req.user.id },
-        { $inc: { xp: deltaXp }, $setOnInsert: { badges: [] }, $set: { lastActivityAt: new Date() } },
-        { new: true, upsert: true }
-      );
-
-      const newBadges = [];
-      if (score >= 90 && !(gam.badges || []).includes('High Scorer')) newBadges.push('High Scorer');
-      if (correct === quiz.questions.length && !(gam.badges || []).includes('Perfect Quiz')) newBadges.push('Perfect Quiz');
-      if (newBadges.length) {
-        gam.badges = Array.from(new Set([...(gam.badges || []), ...newBadges]));
-        await gam.save();
+      const xpReward = getQuizXp(score, quiz.difficulty);
+      
+      // Get or create gamification record
+      let gamification = await Gamification.findOne({ user: req.user.id });
+      if (!gamification) {
+        gamification = new Gamification({ user: req.user.id });
       }
-    } catch (_) {
-      // Best-effort; ignore gamification errors
+
+      // Update XP and stats
+      gamification.xp += xpReward;
+      gamification.totalQuizzesCompleted = (gamification.totalQuizzesCompleted || 0) + 1;
+      gamification.lastActivityAt = new Date();
+      
+      // Update average score
+      const oldTotal = (gamification.averageQuizScore || 0) * (gamification.totalQuizzesCompleted - 1);
+      gamification.averageQuizScore = (oldTotal + score) / gamification.totalQuizzesCompleted;
+
+      // Gather stats for badge checking
+      const userAttempts = await QuizAttempt.find({ student: req.user.id }).lean();
+      const userProgress = await UserProgress.findOne({ user: req.user.id });
+      
+      const stats = {
+        quizzesCompleted: gamification.totalQuizzesCompleted,
+        perfectScores: userAttempts.filter(a => a.score === 100).length,
+        averageAccuracy: gamification.averageQuizScore || 0,
+        consecutiveHighScores: 0, // Simplified: would need to calculate consecutive scores >= 80
+        currentStreak: gamification.streakDays || 0,
+        topicsLearned: (userProgress?.completedTopics?.length || 0)
+      };
+
+      // Check for badge unlocks
+      const newBadges = checkBadgeUnlocks(gamification.badges || [], stats);
+      
+      if (newBadges.length > 0) {
+        const badgesToAdd = newBadges.map(badge => ({
+          id: badge.id,
+          name: badge.name,
+          description: badge.description,
+          icon: badge.icon,
+          category: badge.category,
+          xpReward: badge.xpReward,
+          unlockedAt: new Date()
+        }));
+
+        // Ensure existing badges conform to schema (migrate/ignore malformed entries)
+        const existingValidBadges = (gamification.badges || []).filter(b => (
+          b && b.id && b.name && b.description && b.icon && b.category && b.unlockedAt
+        ));
+        gamification.badges = [...existingValidBadges, ...badgesToAdd];
+        
+        // Award XP for badges
+        const badgeXpBonus = badgesToAdd.reduce((sum, b) => sum + b.xpReward, 0);
+        gamification.xp += badgeXpBonus;
+      }
+
+      await gamification.save();
+
+      res.json({
+        score,
+        correct,
+        total: quiz.questions.length,
+        misconceptions,
+        attemptId: attempt._id,
+        xpAwarded: xpReward,
+        newBadges: newBadges.map(b => ({
+          id: b.id,
+          name: b.name,
+          description: b.description,
+          icon: b.icon
+        }))
+      });
+    } catch (err) {
+      console.error('Gamification error:', err);
+      // Still return attempt success even if gamification fails
+      res.json({
+        score,
+        correct,
+        total: quiz.questions.length,
+        misconceptions,
+        attemptId: attempt._id,
+        xpAwarded: 0,
+        newBadges: []
+      });
     }
-    
-    res.json({
-      score,
-      correct,
-      total: quiz.questions.length,
-      misconceptions,
-      attemptId: attempt._id
-    });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -223,6 +362,46 @@ router.get("/attempts/student", auth, async (req, res) => {
       .sort({ completedAt: -1 });
     
     res.json(attempts);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Secure review endpoint: returns correct answers and explanations for student's own attempt
+router.get("/attempts/:id/review", auth, async (req, res) => {
+  try {
+    const attempt = await QuizAttempt.findById(req.params.id);
+    if (!attempt) {
+      return res.status(404).json({ message: "Attempt not found" });
+    }
+    if (attempt.student.toString() !== req.user.id) {
+      return res.status(403).json({ message: "Access denied" });
+    }
+
+    const quiz = await Quiz.findById(attempt.quiz);
+    if (!quiz) {
+      return res.status(404).json({ message: "Quiz not found" });
+    }
+
+    const answers = attempt.answers.map(a => {
+      const q = quiz.questions.find(q => q._id.toString() === String(a.questionId)) || {};
+      const correctIndex = typeof q.correct === 'number' ? q.correct : null;
+      const correctText = (Array.isArray(q.options) && correctIndex != null) ? q.options[correctIndex] : '';
+      return {
+        questionId: a.questionId,
+        question: q.question || '',
+        options: q.options || [],
+        correctIndex,
+        correctText,
+        isCorrect: a.isCorrect,
+        explanation: q.explanation || ''
+      };
+    });
+
+    res.json({
+      quiz: { id: quiz._id, title: quiz.title, topic: quiz.topic },
+      answers
+    });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -280,10 +459,70 @@ router.put("/:id", auth, async (req, res) => {
     }
 
     const updates = req.body;
+    
+    // Remove duplicates if questions are being updated
+    if (updates.questions && Array.isArray(updates.questions)) {
+      updates.questions = removeDuplicateQuestions(updates.questions);
+      if (uniqueQuestions.length < updates.questions.length) {
+        console.log(`Removed duplicate questions from quiz update`);
+      }
+    }
+    
     quiz.set(updates);
     await quiz.save();
     res.json(quiz);
   } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Remove duplicate questions from all quizzes (Admin only)
+router.post("/cleanup-duplicates", auth, async (req, res) => {
+  try {
+    if (req.user.role !== 'admin') {
+      return res.status(403).json({ message: "Access denied. Admin only." });
+    }
+
+    const allQuizzes = await Quiz.find({ isActive: true });
+    let totalRemoved = 0;
+    let quizzesUpdated = 0;
+
+    for (const quiz of allQuizzes) {
+      if (!Array.isArray(quiz.questions) || quiz.questions.length === 0) {
+        continue;
+      }
+
+      const uniqueQuestions = [];
+      const seenQuestions = new Set();
+      let removedFromQuiz = 0;
+
+      quiz.questions.forEach(q => {
+        const normalizedText = normalizeQuestionText(q.question);
+        if (normalizedText && !seenQuestions.has(normalizedText)) {
+          seenQuestions.add(normalizedText);
+          uniqueQuestions.push(q);
+        } else if (normalizedText) {
+          removedFromQuiz++;
+        }
+      });
+
+      if (removedFromQuiz > 0) {
+        quiz.questions = uniqueQuestions;
+        await quiz.save();
+        totalRemoved += removedFromQuiz;
+        quizzesUpdated++;
+        console.log(`Quiz "${quiz.title}" (${quiz.topic}): Removed ${removedFromQuiz} duplicate question(s)`);
+      }
+    }
+
+    res.json({
+      message: `Cleanup completed. Removed ${totalRemoved} duplicate questions from ${quizzesUpdated} quiz(zes).`,
+      totalRemoved,
+      quizzesUpdated,
+      totalQuizzes: allQuizzes.length
+    });
+  } catch (err) {
+    console.error("Error cleaning up duplicates:", err);
     res.status(500).json({ error: err.message });
   }
 });
@@ -343,6 +582,155 @@ router.delete("/:id", auth, async (req, res) => {
     res.json({ message: "Quiz deactivated successfully" });
   } catch (err) {
     res.status(500).json({ error: err.message });
+  }
+});
+
+// Generate AI Quiz (Adaptive)
+router.post("/generate", auth, async (req, res) => {
+  try {
+    console.log("Generate Quiz Request:", req.body);
+    const { topic, difficulty } = req.body;
+    
+    if (!topic) {
+      return res.status(400).json({ message: "Topic is required" });
+    }
+
+    // Default difficulty if not provided
+    const finalDifficulty = difficulty || 'Intermediate';
+
+    // Find quizzes matching the criteria
+    let query = { isActive: true, topic: topic };
+    if (finalDifficulty && finalDifficulty !== 'Adaptive') {
+      query.difficulty = finalDifficulty;
+    }
+
+    console.log("Querying quizzes with:", query);
+    let sourceQuizzes = await Quiz.find(query);
+    console.log(`Found ${sourceQuizzes.length} matching quizzes`);
+    
+    if (sourceQuizzes.length === 0) {
+      console.log("No direct match, attempting fallback...");
+      // Fallback 1: try to find any quiz with the topic (any difficulty)
+      const fallbackQuizzes = await Quiz.find({ isActive: true, topic: topic });
+      console.log(`Found ${fallbackQuizzes.length} fallback quizzes`);
+      
+      if (fallbackQuizzes.length === 0) {
+        // Fallback 2: try case-insensitive topic match
+        const caseInsensitiveQuizzes = await Quiz.find({ 
+          isActive: true, 
+          topic: { $regex: new RegExp(`^${topic}$`, 'i') }
+        });
+        console.log(`Found ${caseInsensitiveQuizzes.length} case-insensitive matches`);
+        
+        if (caseInsensitiveQuizzes.length === 0) {
+          return res.status(404).json({ 
+            message: `No quizzes found for topic "${topic}". Please ensure there are existing quizzes for this topic, or try a different topic.` 
+          });
+        }
+        sourceQuizzes = caseInsensitiveQuizzes;
+      } else {
+        sourceQuizzes = fallbackQuizzes;
+      }
+    }
+
+    // Aggregate all questions and remove duplicates
+    let allQuestions = [];
+    const seenQuestionIds = new Set();
+    const seenQuestionTexts = new Set();
+    
+    sourceQuizzes.forEach(q => {
+      if (Array.isArray(q.questions) && q.questions.length > 0) {
+        q.questions.forEach(question => {
+          // Deduplicate by _id first (most reliable)
+          const questionId = question._id ? question._id.toString() : null;
+          const normalizedText = normalizeQuestionText(question.question);
+          
+          // Skip if we've seen this question ID or text before
+          if (questionId && seenQuestionIds.has(questionId)) {
+            return;
+          }
+          if (normalizedText && seenQuestionTexts.has(normalizedText)) {
+            return;
+          }
+          
+          // Add to arrays and mark as seen
+          allQuestions.push(question);
+          if (questionId) seenQuestionIds.add(questionId);
+          if (normalizedText) seenQuestionTexts.add(normalizedText);
+        });
+      }
+    });
+
+    console.log(`Total unique questions available: ${allQuestions.length}`);
+
+    if (allQuestions.length === 0) {
+      return res.status(404).json({ 
+        message: `Found quizzes for "${topic}" but they contain no questions. Please contact an administrator.` 
+      });
+    }
+
+    // Ensure minimum 5 questions
+    const minQuestions = Math.min(5, allQuestions.length);
+    const maxQuestions = Math.min(10, allQuestions.length);
+    
+    // Shuffle and select questions (Fisher-Yates shuffle for better randomness)
+    for (let i = allQuestions.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [allQuestions[i], allQuestions[j]] = [allQuestions[j], allQuestions[i]];
+    }
+    let selectedQuestions = allQuestions.slice(0, maxQuestions);
+
+    // Final deduplication pass on selected questions (in case shuffle brought duplicates together)
+    const finalUniqueQuestions = removeDuplicateQuestions(selectedQuestions);
+
+    console.log(`Selected ${finalUniqueQuestions.length} unique questions (removed ${selectedQuestions.length - finalUniqueQuestions.length} duplicates)`);
+
+    // One more deduplication pass before saving to ensure no duplicates slip through
+    const questionsToSave = removeDuplicateQuestions(finalUniqueQuestions);
+
+    console.log(`Final check: Saving ${questionsToSave.length} unique questions (removed ${finalUniqueQuestions.length - questionsToSave.length} more duplicates)`);
+
+    // Construct quiz with deduplicated questions
+    const generatedQuiz = {
+      title: `AI Generated ${topic} Quiz`,
+      description: `Adaptive quiz generated for ${finalDifficulty} level on ${topic}.`,
+      topic: topic,
+      difficulty: finalDifficulty,
+      duration: Math.ceil(questionsToSave.length * 1.5), // ~1.5 min per question
+      questions: questionsToSave, // Use fully deduplicated questions
+      createdBy: req.user.id,
+      isActive: true
+    };
+
+    console.log("Creating new quiz...");
+    const newQuiz = new Quiz(generatedQuiz);
+
+    await newQuiz.save();
+    console.log("Quiz saved successfully:", newQuiz._id);
+
+    // After save, verify and deduplicate again when returning (safety check)
+    const sanitized = newQuiz.toObject();
+    if (Array.isArray(sanitized.questions)) {
+      const uniqueSanitized = removeDuplicateQuestions(sanitized.questions).map(q => ({
+        _id: q._id,
+        question: q.question,
+        options: q.options
+      }));
+      
+      sanitized.questions = uniqueSanitized;
+      
+      if (sanitized.questions.length < newQuiz.questions.length) {
+        console.log(`Warning: Found ${newQuiz.questions.length - sanitized.questions.length} duplicate(s) after save. Removing from response.`);
+      }
+    }
+
+    res.json(sanitized);
+
+  } catch (err) {
+    console.error("Error generating quiz:", err);
+    res.status(500).json({ 
+      error: err.message || "Failed to generate quiz. Please try again later." 
+    });
   }
 });
 

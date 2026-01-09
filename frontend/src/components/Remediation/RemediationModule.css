@@ -6,25 +6,48 @@
 }
 
 .remediation-header {
-  text-align: center;
+  text-align: left;
   margin-bottom: 30px;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
-  padding: 30px;
+  padding: 24px 30px;
   border-radius: 15px;
   box-shadow: 0 8px 32px rgba(102, 126, 234, 0.3);
 }
 
+.header-content {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
 .remediation-header h2 {
-  margin: 0 0 10px 0;
-  font-size: 2.2em;
+  margin: 0 0 6px 0;
+  font-size: 2em;
   font-weight: 600;
 }
 
 .remediation-header p {
   margin: 0;
-  font-size: 1.1em;
+  font-size: 1em;
   opacity: 0.9;
+}
+
+.back-link {
+  background: rgba(255, 255, 255, 0.16);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.back-link:hover {
+  background: rgba(255, 255, 255, 0.25);
 }
 
 .analytics-summary {

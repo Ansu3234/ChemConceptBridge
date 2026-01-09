@@ -4,11 +4,12 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import './MoleculeAnimation.css';
 
-// Molecule data
+// Extensive molecule database
 const MOLECULES = [
   {
     name: 'Water',
     formula: 'H₂O',
+    searchTerms: ['water', 'h2o', 'dihydrogen monoxide'],
     atoms: [
       { element: 'O', x: 0, y: 0, z: 0, color: '#FF0000' },
       { element: 'H', x: -0.8, y: -0.5, z: 0, color: '#FFFFFF' },
@@ -24,6 +25,7 @@ const MOLECULES = [
   {
     name: 'Carbon Dioxide',
     formula: 'CO₂',
+    searchTerms: ['carbon dioxide', 'co2', 'dry ice'],
     atoms: [
       { element: 'C', x: 0, y: 0, z: 0, color: '#808080' },
       { element: 'O', x: 1.2, y: 0, z: 0, color: '#FF0000' },
@@ -39,6 +41,7 @@ const MOLECULES = [
   {
     name: 'Methane',
     formula: 'CH₄',
+    searchTerms: ['methane', 'ch4', 'natural gas'],
     atoms: [
       { element: 'C', x: 0, y: 0, z: 0, color: '#808080' },
       { element: 'H', x: 0.6, y: 0.6, z: 0.6, color: '#FFFFFF' },
@@ -58,6 +61,7 @@ const MOLECULES = [
   {
     name: 'Ammonia',
     formula: 'NH₃',
+    searchTerms: ['ammonia', 'nh3', 'nitrogen trihydride'],
     atoms: [
       { element: 'N', x: 0, y: 0, z: 0, color: '#3050F8' },
       { element: 'H', x: 0.5, y: 0.5, z: 0.5, color: '#FFFFFF' },
@@ -74,7 +78,8 @@ const MOLECULES = [
   },
   {
     name: 'Ethanol',
-    formula: 'C₂H₅OH',
+    formula: 'C₂H₆O',
+    searchTerms: ['ethanol', 'c2h6o', 'alcohol', 'ethyl alcohol'],
     atoms: [
       { element: 'C', x: 0, y: 0, z: 0, color: '#808080' },
       { element: 'C', x: 1.2, y: 0, z: 0, color: '#808080' },
@@ -102,6 +107,7 @@ const MOLECULES = [
   {
     name: 'Benzene',
     formula: 'C₆H₆',
+    searchTerms: ['benzene', 'c6h6', 'aromatic'],
     atoms: [
       { element: 'C', x: 0, y: 1.2, z: 0, color: '#808080' },
       { element: 'C', x: 1.04, y: 0.6, z: 0, color: '#808080' },
@@ -132,14 +138,205 @@ const MOLECULES = [
     ],
     description: 'Aromatic hydrocarbon with a ring structure, found in many organic compounds.',
     properties: ['Aromatic', 'Planar', 'Resonance structure']
+  },
+  {
+    name: 'Hydrogen',
+    formula: 'H₂',
+    searchTerms: ['hydrogen', 'h2', 'dihydrogen'],
+    atoms: [
+      { element: 'H', x: -0.3, y: 0, z: 0, color: '#FFFFFF' },
+      { element: 'H', x: 0.3, y: 0, z: 0, color: '#FFFFFF' }
+    ],
+    bonds: [
+      { from: 0, to: 1 }
+    ],
+    description: 'Diatomic gas, simplest molecule, most abundant element in universe.',
+    properties: ['Diatomic', 'Non-polar', 'Combustible']
+  },
+  {
+    name: 'Oxygen',
+    formula: 'O₂',
+    searchTerms: ['oxygen', 'o2', 'dioxygen'],
+    atoms: [
+      { element: 'O', x: -0.4, y: 0, z: 0, color: '#FF0000' },
+      { element: 'O', x: 0.4, y: 0, z: 0, color: '#FF0000' }
+    ],
+    bonds: [
+      { from: 0, to: 1, double: true }
+    ],
+    description: 'Diatomic gas essential for aerobic respiration.',
+    properties: ['Diatomic', 'Non-polar', 'Essential for life']
+  },
+  {
+    name: 'Nitrogen',
+    formula: 'N₂',
+    searchTerms: ['nitrogen', 'n2', 'dinitrogen'],
+    atoms: [
+      { element: 'N', x: -0.4, y: 0, z: 0, color: '#3050F8' },
+      { element: 'N', x: 0.4, y: 0, z: 0, color: '#3050F8' }
+    ],
+    bonds: [
+      { from: 0, to: 1, triple: true }
+    ],
+    description: 'Diatomic gas, makes up 78% of atmosphere.',
+    properties: ['Diatomic', 'Non-polar', 'Triple bond']
+  },
+  {
+    name: 'Chlorine',
+    formula: 'Cl₂',
+    searchTerms: ['chlorine', 'cl2', 'dichlorine'],
+    atoms: [
+      { element: 'Cl', x: -0.4, y: 0, z: 0, color: '#90EE90' },
+      { element: 'Cl', x: 0.4, y: 0, z: 0, color: '#90EE90' }
+    ],
+    bonds: [
+      { from: 0, to: 1 }
+    ],
+    description: 'Diatomic gas, used in water disinfection.',
+    properties: ['Diatomic', 'Non-polar', 'Toxic gas']
+  },
+  {
+    name: 'Hydrogen Chloride',
+    formula: 'HCl',
+    searchTerms: ['hydrogen chloride', 'hcl', 'hydrochloric acid'],
+    atoms: [
+      { element: 'H', x: -0.3, y: 0, z: 0, color: '#FFFFFF' },
+      { element: 'Cl', x: 0.5, y: 0, z: 0, color: '#90EE90' }
+    ],
+    bonds: [
+      { from: 0, to: 1 }
+    ],
+    description: 'Polar gas, strong acid when dissolved in water.',
+    properties: ['Polar', 'Acidic', 'Corrosive']
+  },
+  {
+    name: 'Acetylene',
+    formula: 'C₂H₂',
+    searchTerms: ['acetylene', 'c2h2', 'ethyne'],
+    atoms: [
+      { element: 'C', x: -0.3, y: 0, z: 0, color: '#808080' },
+      { element: 'C', x: 0.3, y: 0, z: 0, color: '#808080' },
+      { element: 'H', x: -0.9, y: 0.3, z: 0, color: '#FFFFFF' },
+      { element: 'H', x: 0.9, y: 0.3, z: 0, color: '#FFFFFF' }
+    ],
+    bonds: [
+      { from: 0, to: 1, triple: true },
+      { from: 0, to: 2 },
+      { from: 1, to: 3 }
+    ],
+    description: 'Unsaturated hydrocarbon with triple bond, used in welding.',
+    properties: ['Alkyne', 'Combustible', 'Triple bond']
+  },
+  {
+    name: 'Ethane',
+    formula: 'C₂H₆',
+    searchTerms: ['ethane', 'c2h6'],
+    atoms: [
+      { element: 'C', x: -0.4, y: 0, z: 0, color: '#808080' },
+      { element: 'C', x: 0.4, y: 0, z: 0, color: '#808080' },
+      { element: 'H', x: -0.8, y: 0.5, z: 0.5, color: '#FFFFFF' },
+      { element: 'H', x: -0.8, y: -0.5, z: 0.5, color: '#FFFFFF' },
+      { element: 'H', x: -0.8, y: 0, z: -0.7, color: '#FFFFFF' },
+      { element: 'H', x: 0.8, y: 0.5, z: 0.5, color: '#FFFFFF' },
+      { element: 'H', x: 0.8, y: -0.5, z: 0.5, color: '#FFFFFF' },
+      { element: 'H', x: 0.8, y: 0, z: -0.7, color: '#FFFFFF' }
+    ],
+    bonds: [
+      { from: 0, to: 1 },
+      { from: 0, to: 2 },
+      { from: 0, to: 3 },
+      { from: 0, to: 4 },
+      { from: 1, to: 5 },
+      { from: 1, to: 6 },
+      { from: 1, to: 7 }
+    ],
+    description: 'Simplest alkane with two carbon atoms.',
+    properties: ['Alkane', 'Combustible', 'Gas']
+  },
+  {
+    name: 'Propane',
+    formula: 'C₃H₈',
+    searchTerms: ['propane', 'c3h8'],
+    atoms: [
+      { element: 'C', x: -0.6, y: 0, z: 0, color: '#808080' },
+      { element: 'C', x: 0, y: 0, z: 0, color: '#808080' },
+      { element: 'C', x: 0.6, y: 0, z: 0, color: '#808080' },
+      { element: 'H', x: -0.8, y: 0.5, z: 0.5, color: '#FFFFFF' },
+      { element: 'H', x: -0.8, y: -0.5, z: 0.5, color: '#FFFFFF' },
+      { element: 'H', x: -0.8, y: 0, z: -0.7, color: '#FFFFFF' },
+      { element: 'H', x: 0, y: 0.5, z: 0.5, color: '#FFFFFF' },
+      { element: 'H', x: 0, y: -0.5, z: 0.5, color: '#FFFFFF' },
+      { element: 'H', x: 0.8, y: 0.5, z: 0.5, color: '#FFFFFF' },
+      { element: 'H', x: 0.8, y: -0.5, z: 0.5, color: '#FFFFFF' },
+      { element: 'H', x: 0.8, y: 0, z: -0.7, color: '#FFFFFF' }
+    ],
+    bonds: [
+      { from: 0, to: 1 },
+      { from: 1, to: 2 },
+      { from: 0, to: 3 },
+      { from: 0, to: 4 },
+      { from: 0, to: 5 },
+      { from: 1, to: 6 },
+      { from: 1, to: 7 },
+      { from: 2, to: 8 },
+      { from: 2, to: 9 },
+      { from: 2, to: 10 }
+    ],
+    description: 'Three-carbon alkane, used as fuel.',
+    properties: ['Alkane', 'Combustible', 'Fuel']
+  },
+  {
+    name: 'Formaldehyde',
+    formula: 'CH₂O',
+    searchTerms: ['formaldehyde', 'ch2o', 'methanal'],
+    atoms: [
+      { element: 'C', x: 0, y: 0, z: 0, color: '#808080' },
+      { element: 'O', x: 0.8, y: 0.3, z: 0, color: '#FF0000' },
+      { element: 'H', x: -0.4, y: 0.4, z: 0.5, color: '#FFFFFF' },
+      { element: 'H', x: -0.4, y: 0.4, z: -0.5, color: '#FFFFFF' }
+    ],
+    bonds: [
+      { from: 0, to: 1, double: true },
+      { from: 0, to: 2 },
+      { from: 0, to: 3 }
+    ],
+    description: 'Simple aldehyde, used in manufacturing and preservation.',
+    properties: ['Aldehyde', 'Polar', 'Pungent odor']
+  },
+  {
+    name: 'Acetic Acid',
+    formula: 'C₂H₄O₂',
+    searchTerms: ['acetic acid', 'c2h4o2', 'ethanoic acid', 'vinegar'],
+    atoms: [
+      { element: 'C', x: 0, y: 0, z: 0, color: '#808080' },
+      { element: 'C', x: 1.2, y: 0, z: 0, color: '#808080' },
+      { element: 'O', x: 2.2, y: 0.8, z: 0, color: '#FF0000' },
+      { element: 'O', x: 1.4, y: -1, z: 0, color: '#FF0000' },
+      { element: 'H', x: -0.4, y: 0.9, z: 0.3, color: '#FFFFFF' },
+      { element: 'H', x: -0.4, y: -0.5, z: 0.5, color: '#FFFFFF' },
+      { element: 'H', x: -0.4, y: -0.4, z: -0.8, color: '#FFFFFF' },
+      { element: 'H', x: 2.8, y: 0.3, z: 0.5, color: '#FFFFFF' }
+    ],
+    bonds: [
+      { from: 0, to: 1 },
+      { from: 1, to: 2, double: true },
+      { from: 1, to: 3 },
+      { from: 3, to: 7 },
+      { from: 0, to: 4 },
+      { from: 0, to: 5 },
+      { from: 0, to: 6 }
+    ],
+    description: 'Weak acid, main component of vinegar.',
+    properties: ['Carboxylic acid', 'Weak acid', 'Organic acid']
   }
 ];
 
 // Three.js-based molecule visualization component
 const MoleculeAnimation = () => {
-  const [selected, setSelected] = useState(0);
+  const [searchQuery, setSearchQuery] = useState('');
   const [isRotating, setIsRotating] = useState(true);
   const [viewStyle, setViewStyle] = useState('stick');
+  const [displayMolecule, setDisplayMolecule] = useState(MOLECULES[0]);
   
   const containerRef = useRef(null);
   const rendererRef = useRef(null);
@@ -149,8 +346,19 @@ const MoleculeAnimation = () => {
   const moleculeGroupRef = useRef(null);
   const animationFrameRef = useRef(null);
 
+  // Filter molecules based on search query
+  const filteredMolecules = MOLECULES.filter(mol => {
+    const query = searchQuery.toLowerCase();
+    if (!query) return false;
+    return (
+      mol.name.toLowerCase().includes(query) ||
+      mol.formula.toLowerCase().includes(query) ||
+      mol.searchTerms.some(term => term.includes(query))
+    );
+  });
+
   // Get current molecule
-  const molecule = MOLECULES[selected];
+  const molecule = displayMolecule;
 
   // Get atom radius based on element and view style
   const getAtomRadius = (element, style) => {
@@ -194,24 +402,42 @@ const MoleculeAnimation = () => {
       sphere.position.set(atom.x, atom.y, atom.z);
       moleculeGroupRef.current.add(sphere);
 
-      // Add label for larger atoms in ball_stick or sphere mode
-      if ((viewStyle === 'ball_stick' || viewStyle === 'sphere') && atom.element !== 'H') {
-        const canvas = document.createElement('canvas');
-        canvas.width = 64;
-        canvas.height = 64;
-        const context = canvas.getContext('2d');
-        context.fillStyle = 'black';
-        context.font = 'Bold 32px Arial';
-        context.textAlign = 'center';
-        context.textBaseline = 'middle';
-        context.fillText(atom.element, 32, 32);
-        const texture = new THREE.CanvasTexture(canvas);
-        const labelMaterial = new THREE.SpriteMaterial({ map: texture });
-        const sprite = new THREE.Sprite(labelMaterial);
-        sprite.position.set(atom.x, atom.y, atom.z);
-        sprite.scale.set(0.3, 0.3, 0.3);
-        moleculeGroupRef.current.add(sprite);
-      }
+      // Add element label for all atoms - larger and more prominent
+      const canvas = document.createElement('canvas');
+      canvas.width = 128;
+      canvas.height = 128;
+      const context = canvas.getContext('2d');
+      
+      // Draw background circle
+      context.fillStyle = 'rgba(255, 255, 255, 0.95)';
+      context.beginPath();
+      context.arc(64, 64, 55, 0, Math.PI * 2);
+      context.fill();
+      
+      // Draw border
+      context.strokeStyle = 'rgba(0, 0, 0, 0.8)';
+      context.lineWidth = 3;
+      context.beginPath();
+      context.arc(64, 64, 55, 0, Math.PI * 2);
+      context.stroke();
+      
+      // Draw text
+      context.fillStyle = 'black';
+      context.font = 'Bold 72px Arial';
+      context.textAlign = 'center';
+      context.textBaseline = 'middle';
+      context.fillText(atom.element, 64, 64);
+      
+      const texture = new THREE.CanvasTexture(canvas);
+      const labelMaterial = new THREE.SpriteMaterial({ 
+        map: texture,
+        sizeAttenuation: true
+      });
+      const sprite = new THREE.Sprite(labelMaterial);
+      sprite.position.set(atom.x, atom.y, atom.z + 0.3);
+      sprite.scale.set(0.8, 0.8, 0.8);
+      sprite.renderOrder = 1;
+      moleculeGroupRef.current.add(sprite);
     });
 
     // Create bonds
@@ -222,26 +448,51 @@ const MoleculeAnimation = () => {
       const end = new THREE.Vector3(toAtom.x, toAtom.y, toAtom.z);
       const direction = new THREE.Vector3().subVectors(end, start);
       const length = direction.length();
-      const bondRadius = viewStyle === 'stick' ? 0.05 : 0.02;
+      const bondRadius = viewStyle === 'stick' ? 0.06 : 0.03;
       const cylinderGeometry = new THREE.CylinderGeometry(bondRadius, bondRadius, length, 8);
-      const cylinderMaterial = new THREE.MeshPhongMaterial({ color: 0x444444 });
-      const cylinder = new THREE.Mesh(cylinderGeometry, cylinderMaterial);
-      cylinder.position.copy(start);
-      cylinder.position.lerp(end, 0.5);
-      cylinder.quaternion.setFromUnitVectors(
-        new THREE.Vector3(0, 1, 0),
-        direction.clone().normalize()
-      );
-      moleculeGroupRef.current.add(cylinder);
+      const cylinderMaterial = new THREE.MeshPhongMaterial({ color: 0x666666 });
+      
+      const createBond = (offset = null) => {
+        const cylinder = new THREE.Mesh(cylinderGeometry, cylinderMaterial);
+        cylinder.position.copy(start);
+        cylinder.position.lerp(end, 0.5);
+        if (offset) {
+          cylinder.position.add(offset);
+        }
+        cylinder.quaternion.setFromUnitVectors(
+          new THREE.Vector3(0, 1, 0),
+          direction.clone().normalize()
+        );
+        moleculeGroupRef.current.add(cylinder);
+      };
 
-      if (bond.double) {
-        const offset = new THREE.Vector3().crossVectors(
+      // Create main bond
+      createBond();
+
+      // Create additional bonds for double/triple bonds
+      if (bond.double || bond.triple) {
+        const perpendicular = new THREE.Vector3().crossVectors(
+          direction.clone().normalize(),
+          new THREE.Vector3(0, 0, 1)
+        ).normalize();
+        
+        if (!perpendicular.length()) {
+          perpendicular.set(1, 0, 0);
+        }
+
+        const offset = perpendicular.multiplyScalar(0.08);
+        createBond(offset.clone());
+        createBond(offset.clone().negate());
+      }
+
+      if (bond.triple) {
+        const perpendicular2 = new THREE.Vector3().crossVectors(
           direction.clone().normalize(),
           new THREE.Vector3(0, 1, 0)
-        ).normalize().multiplyScalar(0.05);
-        const secondCylinder = cylinder.clone();
-        secondCylinder.position.add(offset);
-        moleculeGroupRef.current.add(secondCylinder);
+        ).normalize();
+        
+        const offset2 = perpendicular2.multiplyScalar(0.08);
+        createBond(offset2);
       }
     });
 
@@ -395,7 +646,7 @@ const MoleculeAnimation = () => {
   // Rebuild molecule when selection or view style changes
   useEffect(() => {
     buildMolecule();
-  }, [selected, viewStyle]);
+  }, [displayMolecule, viewStyle]);
 
   return (
     <div className="molecule-animation">
@@ -406,19 +657,35 @@ const MoleculeAnimation = () => {
       
       <div className="ma-content">
         <div className="molecule-selector">
-          <label htmlFor="mol-select">Select Molecule:</label>
-          <select 
-            id="mol-select" 
-            value={selected} 
-            onChange={e => setSelected(Number(e.target.value))}
-            className="molecule-select"
-          >
-            {MOLECULES.map((mol, idx) => (
-              <option value={idx} key={mol.name}>
-                {mol.name} ({mol.formula})
-              </option>
-            ))}
-          </select>
+          <label htmlFor="mol-search">Search Molecules:</label>
+          <input 
+            id="mol-search"
+            type="text"
+            placeholder="Type molecule name or formula (e.g., 'water', 'H2O', 'CH4')..."
+            value={searchQuery}
+            onChange={e => setSearchQuery(e.target.value)}
+            className="molecule-search-input"
+          />
+          {searchQuery && filteredMolecules.length > 0 && (
+            <div className="search-results">
+              {filteredMolecules.map((mol) => (
+                <div 
+                  key={mol.name}
+                  className="search-result-item"
+                  onClick={() => {
+                    setDisplayMolecule(mol);
+                    setSearchQuery('');
+                  }}
+                >
+                  <span className="result-name">{mol.name}</span>
+                  <span className="result-formula">{mol.formula}</span>
+                </div>
+              ))}
+            </div>
+          )}
+          {searchQuery && filteredMolecules.length === 0 && (
+            <div className="no-results">No molecules found. Try another search.</div>
+          )}
         </div>
 
         <div className="molecule-display">

@@ -13,6 +13,8 @@ from sklearn.pipeline import Pipeline
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.naive_bayes import GaussianNB
 from sklearn.neural_network import MLPClassifier
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.svm import SVC
 from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
 
 MODELS_DIR = Path(__file__).parent / "models"
@@ -62,6 +64,31 @@ def train_and_save(dataset_path=None, test_size=0.2, random_state=42):
         "confusion_matrix": classification_matrix_to_list(confusion_matrix(y_test, preds))
     }
     dump(nb_pipe, MODELS_DIR / "naive_bayes.joblib")
+
+    # Decision Tree
+    dt_model = DecisionTreeClassifier(random_state=random_state, max_depth=10)
+    dt_model.fit(X_train, y_train)
+    preds = dt_model.predict(X_test)
+    results['decision_tree'] = {
+        "accuracy": float(accuracy_score(y_test, preds)),
+        "classification_report": classification_report(y_test, preds, output_dict=True),
+        "confusion_matrix": classification_matrix_to_list(confusion_matrix(y_test, preds))
+    }
+    dump(dt_model, MODELS_DIR / "decision_tree.joblib")
+
+    # SVM
+    svm_pipe = Pipeline([
+        ("scaler", StandardScaler()),
+        ("svm", SVC(kernel="rbf", probability=True, random_state=random_state))
+    ])
+    svm_pipe.fit(X_train, y_train)
+    preds = svm_pipe.predict(X_test)
+    results['svm'] = {
+        "accuracy": float(accuracy_score(y_test, preds)),
+        "classification_report": classification_report(y_test, preds, output_dict=True),
+        "confusion_matrix": classification_matrix_to_list(confusion_matrix(y_test, preds))
+    }
+    dump(svm_pipe, MODELS_DIR / "svm.joblib")
 
     # Neural Network (MLP)
     mlp_pipe = Pipeline([
@@ -139,7 +166,7 @@ def main():
             model = payload.get("model")
             features = payload.get("features")
             if not model or features is None:
-                raise ValueError("Provide 'model' (knn|naive_bayes|neural_network) and 'features'")
+                raise ValueError("Provide 'model' (knn|naive_bayes|decision_tree|svm|neural_network) and 'features'")
             out = predict_with_model(model, features)
             print(json.dumps({"success": True, "model": model, "result": out}, default=str))
             return
@@ -148,7 +175,7 @@ def main():
             features = payload.get("features")
             if features is None:
                 raise ValueError("Provide 'features' as list")
-            models = ["knn", "naive_bayes", "neural_network"]
+            models = ["knn", "naive_bayes", "decision_tree", "svm", "neural_network"]
             all_results = {}
             for m in models:
                 try:

@@ -1,0 +1,404 @@
+.topic-diagram-container {
+  width: 100%;
+  height: 100%;
+  min-height: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.topic-diagram-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 300px;
+  color: #6b7280;
+}
+
+.placeholder-icon {
+  font-size: 48px;
+  margin-bottom: 12px;
+}
+
+.placeholder-text {
+  font-size: 14px;
+  text-align: center;
+}
+
+/* pH Scale Styles */
+.ph-scale-diagram {
+  width: 100%;
+  padding: 20px;
+}
+
+.ph-scale-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  font-weight: 600;
+  font-size: 12px;
+  color: #374151;
+}
+
+.ph-scale-bar {
+  display: flex;
+  height: 50px;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  margin-bottom: 16px;
+}
+
+.ph-value {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 600;
+  font-size: 11px;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  border-right: 1px solid rgba(255, 255, 255, 0.2);
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.ph-value:hover {
+  transform: scaleY(1.1);
+}
+
+.ph-value:last-child {
+  border-right: none;
+}
+
+.ph-formula-display {
+  text-align: center;
+  font-size: 18px;
+  color: #1e293b;
+  padding: 12px;
+  background: #f8fafc;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+}
+
+/* Energy Diagram Styles */
+.energy-diagram {
+  width: 100%;
+  padding: 20px;
+}
+
+.energy-axis {
+  display: flex;
+  flex-direction: column;
+  height: 300px;
+  position: relative;
+}
+
+.energy-label {
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 8px;
+  text-align: center;
+}
+
+.energy-levels {
+  flex: 1;
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 4px;
+  padding: 12px;
+  background: #f8fafc;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+}
+
+.energy-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 600;
+  font-size: 12px;
+  border-radius: 4px;
+  padding: 8px;
+  transition: all 0.3s;
+}
+
+.energy-bar.reactants {
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+}
+
+.energy-bar.activation {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+}
+
+.energy-bar.products {
+  background: linear-gradient(135deg, #10b981, #059669);
+}
+
+.energy-legend {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin-top: 16px;
+  flex-wrap: wrap;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: #374151;
+}
+
+.legend-color {
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+}
+
+/* Stoichiometry Diagram Styles */
+.stoichiometry-diagram {
+  width: 100%;
+  padding: 20px;
+}
+
+.reaction-equation {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.reactant-side,
+.product-side {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.molecule {
+  padding: 12px 20px;
+  background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+  border: 2px solid #3b82f6;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 18px;
+  color: #1e40af;
+  box-shadow: 0 2px 4px rgba(59, 130, 246, 0.2);
+}
+
+.arrow {
+  font-size: 24px;
+  font-weight: bold;
+  color: #374151;
+}
+
+.mole-ratios {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px;
+  background: #f8fafc;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+}
+
+.ratio-item {
+  text-align: center;
+  font-size: 14px;
+  color: #374151;
+}
+
+/* Equilibrium Diagram Styles */
+.equilibrium-diagram {
+  width: 100%;
+  padding: 20px;
+}
+
+.equilibrium-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  margin-bottom: 20px;
+  padding: 20px;
+  background: #f8fafc;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+}
+
+.reactants-box,
+.products-box {
+  flex: 1;
+  min-height: 200px;
+  padding: 16px;
+  background: white;
+  border-radius: 8px;
+  border: 2px solid #e2e8f0;
+  display: flex;
+  flex-direction: column;
+}
+
+.box-label {
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 12px;
+  text-align: center;
+  font-size: 14px;
+}
+
+.particles {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+  transition: opacity 0.3s;
+}
+
+.particle {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  margin: 0 auto;
+}
+
+.particle.reactant {
+  background: #3b82f6;
+}
+
+.particle.product {
+  background: #10b981;
+}
+
+.equilibrium-arrow {
+  font-size: 32px;
+  color: #6b7280;
+}
+
+.equilibrium-control {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px;
+  background: white;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+}
+
+.equilibrium-control label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #374151;
+  text-align: center;
+}
+
+.equilibrium-control input[type="range"] {
+  width: 100%;
+}
+
+/* Redox Diagram Styles */
+.redox-diagram {
+  width: 100%;
+  padding: 20px;
+}
+
+.redox-reaction {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.redox-half {
+  flex: 1;
+  min-width: 200px;
+  padding: 20px;
+  background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+  border-radius: 12px;
+  border: 2px solid #0ea5e9;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.half-title {
+  font-weight: 700;
+  font-size: 16px;
+  color: #0c4a6e;
+  text-transform: uppercase;
+}
+
+.half-reaction {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.element {
+  padding: 8px 12px;
+  background: white;
+  border-radius: 6px;
+  color: #1e40af;
+  border: 1px solid #3b82f6;
+}
+
+.electron {
+  padding: 8px 12px;
+  background: #fef3c7;
+  border-radius: 6px;
+  color: #92400e;
+  border: 1px solid #f59e0b;
+}
+
+.half-note {
+  font-size: 12px;
+  color: #64748b;
+  font-style: italic;
+}
+
+.redox-separator {
+  font-size: 24px;
+  font-weight: bold;
+  color: #374151;
+}
+
+.redox-total {
+  text-align: center;
+  padding: 16px;
+  background: #f8fafc;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  font-size: 16px;
+  color: #1e293b;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .reaction-equation {
+    flex-direction: column;
+  }
+  
+  .redox-reaction {
+    flex-direction: column;
+  }
+  
+  .equilibrium-container {
+    flex-direction: column;
+  }
+  
+  .energy-levels {
+    height: 200px;
+  }
+}
+

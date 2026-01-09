@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, ArcElement, PointElement, LineElement } from 'chart.js';
+import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, ArcElement, PointElement, LineElement, Filler } from 'chart.js';
+import api from '../../apiClient';
 import { Bar, Doughnut, Line } from 'react-chartjs-2';
 import './ProgressTracker.css';
 
@@ -13,7 +14,8 @@ ChartJS.register(
   Legend,
   ArcElement,
   PointElement,
-  LineElement
+  LineElement,
+  Filler
 );
 
 const ProgressTracker = () => {
@@ -39,20 +41,7 @@ const ProgressTracker = () => {
           return;
         }
         
-        const response = await fetch('http://localhost:5000/api/user/stats', {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          }
-        });
-        
-        if (!response.ok) {
-          // Don't redirect, just show default stats
-          setLoading(false);
-          return;
-        }
-        
-        const data = await response.json();
+        const { data } = await api.get('/user/stats');
         setStats({
           totalQuizzes: data.totalQuizzes || 0,
           accuracy: data.accuracy || 0,

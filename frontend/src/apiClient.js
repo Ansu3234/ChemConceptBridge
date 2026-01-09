@@ -3,19 +3,9 @@
 
 import axios from 'axios';
 
-// Use environment variable on Render, fallback to local dev API
-const resolveBaseURL = () => {
-  if (typeof window !== 'undefined') {
-    const host = window.location.hostname;
-    if (host === 'localhost' || host === '127.0.0.1') {
-      return 'http://localhost:5000/api';
-    }
-  }
-  return 'https://backend-project-1-sjrn.onrender.com/api';
-};
-
+// Backend is running on port 10000
 const api = axios.create({
-  baseURL: process.env.REACT_APP_API_BASE_URL || resolveBaseURL(),
+  baseURL: 'http://localhost:10000/api',
 });
 
 // Automatically attach JWT token from localStorage

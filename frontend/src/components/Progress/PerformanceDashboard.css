@@ -83,3 +83,109 @@
   font-size: 1rem;
   font-weight: 500;
 }
+
+/* AI Prediction Styles */
+.ai-prediction-section {
+  margin-bottom: 2rem;
+  background: linear-gradient(135deg, #fdf4ff 0%, #fae8ff 100%);
+  border: 1px solid #f0abfc;
+  border-radius: 12px;
+  padding: 1.5rem;
+}
+
+.ai-prediction-section h3 {
+  color: #86198f;
+  margin-top: 0;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.prediction-card {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem;
+  align-items: center;
+}
+
+.prediction-main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: white;
+  padding: 1rem 2rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.prediction-label {
+  font-size: 0.9rem;
+  color: #64748b;
+  margin-bottom: 0.25rem;
+}
+
+.prediction-value {
+  font-size: 1.5rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.prediction-value.weak { color: #ef4444; }
+.prediction-value.average { color: #f59e0b; }
+.prediction-value.strong { color: #10b981; }
+
+.prediction-details {
+  flex: 1;
+  min-width: 250px;
+}
+
+.estimated-score {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+  font-weight: 600;
+  color: #4a044e;
+}
+
+.probability-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.prob-bar-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+}
+
+.prob-label {
+  width: 60px;
+  text-transform: capitalize;
+  color: #555;
+}
+
+.prob-track {
+  flex: 1;
+  height: 8px;
+  background: rgba(255,255,255,0.5);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.prob-fill {
+  height: 100%;
+  border-radius: 4px;
+}
+
+.prob-fill.weak { background: #fca5a5; }
+.prob-fill.average { background: #fcd34d; }
+.prob-fill.strong { background: #6ee7b7; }
+
+.prob-val {
+  width: 35px;
+  text-align: right;
+  color: #666;
+}

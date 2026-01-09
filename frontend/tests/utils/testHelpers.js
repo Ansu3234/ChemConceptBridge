@@ -47,9 +47,17 @@ export async function waitForApiResponse(page, url, timeout = 5000) {
  * @param {import('@playwright/test').Page} page - Playwright page object
  */
 export async function clearStorage(page) {
+  // Ensure we have an origin; localStorage is unavailable on about:blank
+  if (page.url() === 'about:blank') {
+    await page.goto('/');
+  }
   await page.evaluate(() => {
-    localStorage.clear();
-    sessionStorage.clear();
+    try {
+      localStorage.clear();
+      sessionStorage.clear();
+    } catch (e) {
+      // Ignore storage access errors, continue tests
+    }
   });
 }
 

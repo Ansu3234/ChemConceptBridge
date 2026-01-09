@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import './HomePage.css';
+import Navbar from '../components/Layout/Navbar';
 import MoleculeAnimation from '../components/MoleculeAnimation/MoleculeAnimation';
 import Testimonials from '../components/Testimonials/Testimonials';
 // Import Poppins font
@@ -15,7 +16,7 @@ import { FaFlask, FaAtom, FaChalkboardTeacher, FaUserGraduate, FaChartLine, FaAr
 import { IoMdBook } from 'react-icons/io';
 import { BsLightningChargeFill } from 'react-icons/bs';
 
-function HomePage() {
+function HomePage({ user }) {
     const [scrolled, setScrolled] = useState(false);
     const [activeFeature, setActiveFeature] = useState(0);
     
@@ -66,23 +67,7 @@ function HomePage() {
     
     return (
         <div className="home-container">
-            <header className={`home-header ${scrolled ? 'scrolled' : ''}`}>
-                <div className="logo-container">
-                    <div className="logo-icon">
-                        <FaFlask className="flask-icon" />
-                        <div className="atom-orbit"></div>
-                    </div>
-                    <span className="logo-text">ChemConcept Bridge</span>
-                </div>
-                <nav className="header-nav">
-                    <a href="#about" className="nav-link">About</a>
-                    <a href="#features" className="nav-link">Features</a>
-                    <a href="#testimonials" className="nav-link">Testimonials</a>
-                    <a href="#contact" className="nav-link">Contact</a>
-                    <Link to="/login" className="login-button">Sign In</Link>
-                    <Link to="/register" className="register-button">Register</Link>
-                </nav>
-            </header>
+            <Navbar user={user} />
             
             <div className="hero-section">
                 <div className="particles-background"></div>

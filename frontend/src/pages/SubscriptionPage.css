@@ -1,0 +1,226 @@
+.subscription-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f8faff 0%, #f0f5ff 100%);
+  padding: 4rem 2rem;
+  font-family: 'Poppins', sans-serif;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Background particles similar to HomePage */
+.subscription-container::before,
+.subscription-container::after {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(44, 123, 229, 0.05);
+  z-index: 0;
+}
+
+.subscription-container::before {
+  width: 400px;
+  height: 400px;
+  top: -100px;
+  right: -100px;
+}
+
+.subscription-container::after {
+  width: 300px;
+  height: 300px;
+  bottom: -50px;
+  left: -50px;
+}
+
+.subscription-header {
+  text-align: center;
+  margin-bottom: 4rem;
+  position: relative;
+  z-index: 1;
+}
+
+.subscription-header h1 {
+  font-size: 3rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  background: linear-gradient(135deg, #2c3e50, #4a6491);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.subscription-header p {
+  color: #555;
+  font-size: 1.2rem;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.plans-container {
+  display: flex;
+  justify-content: center;
+  gap: 2.5rem;
+  flex-wrap: wrap;
+  max-width: 1200px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 1;
+}
+
+.plan-card {
+  background: white;
+  border-radius: 20px;
+  padding: 2.5rem;
+  width: 340px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.plan-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 20px 40px rgba(44, 123, 229, 0.15);
+}
+
+.plan-card.featured {
+  border: 2px solid #2c7be5;
+  transform: scale(1.05);
+  box-shadow: 0 15px 35px rgba(44, 123, 229, 0.2);
+}
+
+.plan-card.featured:hover {
+  transform: scale(1.05) translateY(-10px);
+  box-shadow: 0 25px 50px rgba(44, 123, 229, 0.25);
+}
+
+.popular-badge {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: linear-gradient(135deg, #2c7be5, #27aae1);
+  color: white;
+  padding: 8px 20px;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  box-shadow: 0 4px 10px rgba(44, 123, 229, 0.3);
+  white-space: nowrap;
+}
+
+.plan-header {
+  text-align: center;
+  margin-bottom: 2rem;
+  padding-bottom: 2rem;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.plan-icon {
+  font-size: 2.5rem;
+  color: #2c7be5;
+  margin-bottom: 1rem;
+  display: inline-block;
+}
+
+.plan-name {
+  font-size: 1.5rem;
+  color: #2c3e50;
+  margin-bottom: 0.5rem;
+  font-weight: 700;
+}
+
+.plan-price {
+  font-size: 3rem;
+  color: #2c3e50;
+  font-weight: 800;
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+}
+
+.plan-currency {
+  font-size: 1.5rem;
+  margin-right: 4px;
+  color: #555;
+}
+
+.plan-period {
+  color: #95a5a6;
+  font-size: 1rem;
+  font-weight: 400;
+  margin-left: 4px;
+}
+
+.plan-features {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 2.5rem 0;
+  flex-grow: 1;
+}
+
+.plan-features li {
+  margin-bottom: 1rem;
+  color: #555;
+  display: flex;
+  align-items: center;
+  font-size: 0.95rem;
+}
+
+.feature-icon {
+  margin-right: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+}
+
+.plan-button {
+  width: 100%;
+  padding: 14px;
+  border-radius: 30px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: center;
+  border: none;
+}
+
+.plan-button.primary {
+  background: linear-gradient(135deg, #2c7be5, #27aae1);
+  color: white;
+  box-shadow: 0 4px 15px rgba(44, 123, 229, 0.3);
+}
+
+.plan-button.primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(44, 123, 229, 0.4);
+}
+
+.plan-button.outline {
+  background: white;
+  color: #2c7be5;
+  border: 2px solid #2c7be5;
+}
+
+.plan-button.outline:hover {
+  background: rgba(44, 123, 229, 0.05);
+  transform: translateY(-2px);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .subscription-header h1 {
+    font-size: 2.2rem;
+  }
+  
+  .plan-card.featured {
+    transform: scale(1);
+  }
+  
+  .plan-card.featured:hover {
+    transform: translateY(-10px);
+  }
+}

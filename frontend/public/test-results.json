@@ -1,0 +1,25 @@
+[
+  {
+    "file": "real-login.spec.js",
+    "tests": [
+      {
+        "name": "should load login page",
+        "status": "passed",
+        "time": 2.5,
+        "browsers": [
+          "chromium",
+          "firefox",
+          "webkit"
+        ]
+      },
+      {
+        "name": "should login successfully with real credentials",
+        "status": "passed",
+        "time": 5.2,
+        "browsers": [
+          "chromium"
+        ]
+      }
+    ]
+  }
+]

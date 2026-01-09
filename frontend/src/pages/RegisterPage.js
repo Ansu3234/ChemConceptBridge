@@ -86,9 +86,9 @@ function RegisterPage() {
     }
     setLoading(true);
     try {
-      await api.post(`/auth/register`, { name, email, password });
+      await api.post("/auth/register", { name, email, password });
       // Auto-login
-      const loginRes = await api.post(`/auth/login`, { email, password });
+      const loginRes = await api.post("/auth/login", { email, password });
       const token = loginRes.data.token;
       localStorage.setItem("token", token);
       navigate("/dashboard");
@@ -182,7 +182,8 @@ function RegisterPage() {
           <button
             type="submit"
             className="register-btn"
-            disabled={loading || emailChecking || emailExists || !!validateEmail(email)}
+            disabled={loading}
+          disabled={loading || emailChecking || emailExists || !!validateEmail(email)}
           >
             {loading ? 'Registering...' : (emailExists ? 'Email Already Registered' : 'Create Account')}
           </button>

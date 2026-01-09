@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import './QuizEngine.css';
 import api from '../../apiClient';
 import RemediationModule from '../Remediation/RemediationModule';
+import AIQuizGenerator from './AIQuizGenerator';
 
 const QuizEngine = () => {
   const [quizzes, setQuizzes] = useState([]);
@@ -14,6 +15,7 @@ const QuizEngine = () => {
   const [timeLeft, setTimeLeft] = useState(0);
   const [showResults, setShowResults] = useState(false);
   const [lastAttemptId, setLastAttemptId] = useState(null);
+  const [userPerformance, setUserPerformance] = useState(null);
 
   useEffect(() => {
     (async () => {
@@ -31,6 +33,15 @@ const QuizEngine = () => {
         setQuizzes(list);
       } catch (e) {
         setQuizzes([]);
+      }
+
+      try {
+        const { data } = await api.get('/ml/my-prediction');
+        if (data && data.prediction) {
+          setUserPerformance(data.prediction);
+        }
+      } catch (e) {
+        console.error("Failed to fetch prediction", e);
       }
     })();
   }, []);
@@ -62,6 +73,10 @@ const QuizEngine = () => {
     } catch (e) {
       // noop
     }
+  };
+
+  const handleQuizGenerated = (quiz) => {
+    startQuiz({ id: quiz._id });
   };
 
   const handleAnswerSelect = (questionId, answerIndex) => {
@@ -152,7 +167,7 @@ const QuizEngine = () => {
             <div className="score-circle">
               <span className="score-value">{score}%</span>
             </div>
-            <h3>Great job!</h3>
+            <h3>{score >= 80 ? 'Great job!' : score >= 50 ? 'Good effort' : 'Keep trying'}</h3>
             <p>You answered {Object.keys(answers).length} out of {selectedQuiz.questions.length} questions</p>
           </div>
           
@@ -170,7 +185,7 @@ const QuizEngine = () => {
         {lastAttemptId ? (
           <div className="remediation-wrap">
             <h3>Recommended next steps</h3>
-            <RemediationModule attemptId={lastAttemptId} />
+            <RemediationModule attemptId={lastAttemptId} score={score} />
           </div>
         ) : null}
       </div>
@@ -241,6 +256,11 @@ const QuizEngine = () => {
         <h2>Available Quizzes</h2>
         <p>Test your chemistry knowledge with our adaptive quiz system</p>
       </div>
+
+      <AIQuizGenerator 
+        onQuizGenerated={handleQuizGenerated} 
+        userPerformance={userPerformance} 
+      />
 
       <div className="quiz-grid">
         {quizzes.map(quiz => (

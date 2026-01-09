@@ -6,6 +6,7 @@ const UserProgress = require('../models/UserProgress');
 const Gamification = require('../models/Gamification');
 const authMiddleware = require('../middleware/authMiddleware');
 const Quiz = require('../models/Quiz');
+const { checkBadgeUnlocks, calculateLevel, getQuizXp } = require('../utils/badgeDefinitions');
 
 const router = express.Router();
 
@@ -87,14 +88,55 @@ router.get('/performance', authMiddleware, async (req, res) => {
   }
 });
 
-// Gamification: get my XP and badges and leaderboard
+// Gamification: get my XP, badges, and leaderboard with full stats
 router.get('/gamification', authMiddleware, async (req, res) => {
   try {
-    const me = await Gamification.findOne({ user: req.user.id });
-    const leaderboard = await Gamification.find({}).populate('user', 'name').sort({ xp: -1 }).limit(20);
+    const userId = req.user.id;
+    
+    // Get user gamification data
+    let gamification = await Gamification.findOne({ user: userId }).populate('user', 'name email');
+    if (!gamification) {
+      gamification = new Gamification({ user: userId });
+      await gamification.save();
+    }
+
+    // Calculate level
+    const levelInfo = calculateLevel(gamification.xp);
+
+    // Get leaderboard (top 20 students)
+    const leaderboard = await Gamification.find({})
+      .populate('user', 'name email role')
+      .sort({ xp: -1 })
+      .limit(20)
+      .lean();
+
+    const leaderboardData = leaderboard.map((g, idx) => ({
+      rank: idx + 1,
+      name: g.user?.name || 'Student',
+      xp: g.xp,
+      level: calculateLevel(g.xp).level,
+      badges: g.badges || [],
+      isCurrentUser: g.user?._id?.toString() === userId.toString()
+    }));
+
+    // Find user's rank
+    const userRank = leaderboardData.find(u => u.isCurrentUser)?.rank || 
+                     (await Gamification.countDocuments({ xp: { $gt: gamification.xp } })) + 1;
+
     res.json({
-      me: me || { user: req.user.id, xp: 0, badges: [] },
-      leaderboard: leaderboard.map((g, idx) => ({ rank: idx + 1, name: g.user?.name || 'Student', xp: g.xp }))
+      personal: {
+        xp: gamification.xp,
+        level: levelInfo.level,
+        progressToNextLevel: levelInfo.progressToNextLevel,
+        badges: gamification.badges || [],
+        streakDays: gamification.streakDays || 0,
+        totalQuizzesCompleted: gamification.totalQuizzesCompleted || 0,
+        totalTopicsLearned: gamification.totalTopicsLearned || 0,
+        averageQuizScore: gamification.averageQuizScore || 0,
+        rank: userRank,
+        totalPlayers: await Gamification.countDocuments({})
+      },
+      leaderboard: leaderboardData
     });
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -201,6 +243,24 @@ router.get('/students', authMiddleware, async (req, res) => {
     const query = req.user.role === 'teacher' ? { assignedTeacher: req.user.id, role: 'student' } : { role: 'student' };
     const students = await User.find(query).select('name email role assignedTeacher createdAt');
     res.json(students);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// Get detailed badge information
+router.get('/badges/details', authMiddleware, async (req, res) => {
+  try {
+    const { BADGES } = require('../utils/badgeDefinitions');
+    const badgeList = Object.values(BADGES).map(badge => ({
+      id: badge.id,
+      name: badge.name,
+      description: badge.description,
+      icon: badge.icon,
+      category: badge.category,
+      xpReward: badge.xpReward
+    }));
+    res.json({ badges: badgeList });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

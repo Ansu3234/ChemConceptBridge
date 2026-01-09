@@ -1,17 +1,22 @@
-import React, { useState, useEffect } from "react";
-import "./StudentDashboard.css";
-import ConceptPages from "../Concepts/ConceptPages";
-import QuizEngine from "../Quiz/QuizEngine";
-import ConceptMap from "../ConceptMap/ConceptMap";
-import ProgressTracker from "../Progress/ProgressTracker";
-import RemediationModule from "../Remediation/RemediationModule";
-import Leaderboard from "../Gamification/Leaderboard";
-import ConfidenceMeter from "../Progress/ConfidenceMeter";
-import PerformanceDashboard from "../Progress/PerformanceDashboard";
-import MoleculeAnimation from "../MoleculeAnimation/MoleculeAnimation";
-import PeriodicTable from "../PeriodicTable/PeriodicTable";
-import ChemicalEquations from "../ChemicalEquations/ChemicalEquations";
-import ChemistryCalculator from "../ChemistryCalculator/ChemistryCalculator";
+import React, { useState, useEffect } from 'react';
+import api from '../../apiClient';
+import './StudentDashboard.css';
+import ConceptPages from '../Concepts/ConceptPages';
+import QuizEngine from '../Quiz/QuizEngine';
+import ConceptMap from '../ConceptMap/ConceptMap';
+import ProgressTracker from '../Progress/ProgressTracker';
+import LearningPath from '../Progress/LearningPath';
+import RemediationModule from '../Remediation/RemediationModule';
+import GamifiedTracker from '../Gamification/GamifiedTracker';
+import Leaderboard from '../Gamification/Leaderboard';
+import ConfidenceMeter from '../Progress/ConfidenceMeter';
+import PerformanceDashboard from '../Progress/PerformanceDashboard';
+import PeriodicTable from '../PeriodicTable/PeriodicTable';
+import ChemicalEquations from '../ChemicalEquations/ChemicalEquations';
+import ChemistryCalculator from '../ChemistryCalculator/ChemistryCalculator';
+import ARMultimediaModule from '../ARMultimedia/ARMultimediaModule';
+import SubscriptionPage from '../../pages/SubscriptionPage';
+import KnowledgeGraphVisualizer from '../KnowledgeGraph/KnowledgeGraphVisualizer';
 
 const StudentDashboard = ({ activeTab, setActiveTab }) => {
   const [studentStats, setStudentStats] = useState({
@@ -20,234 +25,303 @@ const StudentDashboard = ({ activeTab, setActiveTab }) => {
     conceptsLearned: 0,
     currentStreak: 0,
     xpPoints: 0,
-    level: 1,
+    level: 1
   });
 
   const [recentActivity, setRecentActivity] = useState([]);
-  const [userName, setUserName] = useState("");
+  const [userName, setUserName] = useState('');
+  const [selectedLearningTopic, setSelectedLearningTopic] = useState(null);
+  const [nextTopics, setNextTopics] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Load user name from localStorage
-    const storedName = localStorage.getItem("userName");
-    setUserName(storedName || "Student");
+    const storedName = localStorage.getItem('userName');
+    setUserName(storedName || 'Student');
 
-    // Fetch user stats from backend
-    const fetchStats = async () => {
+    // Listen for navigation events from child components
+    const handleNavigate = (event) => {
+      const { tab, topic } = event.detail || {};
+      if (tab) {
+        setActiveTab(tab);
+        if (topic) {
+          setSelectedLearningTopic(topic);
+        }
+      }
+    };
+
+    window.addEventListener('navigate-to-tab', handleNavigate);
+
+    const fetchDashboardData = async () => {
       try {
-        const token = localStorage.getItem("token");
-        if (!token) return;
+        setLoading(true);
+        const [statsRes, recentRes, pathRes] = await Promise.all([
+          api.get('/user/stats').catch(() => ({ data: {} })),
+          api.get('/quiz/attempts/student').catch(() => ({ data: [] })),
+          api.get('/learning-path').catch(() => ({ data: {} }))
+        ]);
 
-        const API_BASE_URL =
-          process.env.REACT_APP_API_BASE_URL || "http://localhost:10000/api";
-        const response = await fetch(`${API_BASE_URL}/user/stats`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        });
-
-        if (!response.ok) throw new Error("Failed to fetch stats");
-        const stats = await response.json();
+        const stats = statsRes.data;
         setStudentStats({
           totalQuizzes: stats.totalQuizzes ?? 0,
           accuracy: stats.accuracy ?? 0,
           conceptsLearned: stats.conceptsLearned ?? 0,
           currentStreak: stats.currentStreak ?? 0,
           xpPoints: stats.xpPoints ?? 0,
-          level: stats.level ?? 1,
+          level: stats.level ?? 1
         });
+
+        const attempts = recentRes.data || [];
+        // Limit to 3 most recent attempts
+        const recentAttempts = attempts.slice(0, 3);
+        const formattedActivity = recentAttempts.map(attempt => ({
+          id: attempt._id,
+          type: 'quiz',
+          title: attempt.quiz?.title || 'Quiz Attempt',
+          score: attempt.score || 0,
+          date: attempt.completedAt 
+            ? new Date(attempt.completedAt).toLocaleDateString() 
+            : attempt.createdAt 
+            ? new Date(attempt.createdAt).toLocaleDateString()
+            : 'Recently',
+          topic: attempt.quiz?.topic || 'General'
+        }));
+        setRecentActivity(formattedActivity);
+
+        const pathData = pathRes.data || {};
+        setNextTopics(pathData.weeklyTopics?.slice(0, 3) || []);
       } catch (err) {
+        console.error('Dashboard fetch error:', err);
         setStudentStats({
           totalQuizzes: 0,
           accuracy: 0,
           conceptsLearned: 0,
           currentStreak: 0,
           xpPoints: 0,
-          level: 1,
+          level: 1
         });
+      } finally {
+        setLoading(false);
       }
     };
 
-    // Initial fetch
-    fetchStats();
+    fetchDashboardData();
 
-    // Refresh stats when a concept is completed
-    const onConceptCompleted = () => fetchStats();
-    window.addEventListener("concept-completed", onConceptCompleted);
-
-    // Dummy recent activity
-    setRecentActivity([
-      {
-        id: 1,
-        type: "quiz",
-        title: "Acids and Bases Quiz",
-        score: 85,
-        date: "2024-01-15",
-      },
-      {
-        id: 2,
-        type: "concept",
-        title: "Periodic Table",
-        status: "completed",
-        date: "2024-01-14",
-      },
-      {
-        id: 3,
-        type: "remediation",
-        title: "Chemical Bonding Review",
-        date: "2024-01-13",
-      },
-    ]);
+    const onConceptCompleted = () => fetchDashboardData();
+    window.addEventListener('concept-completed', onConceptCompleted);
 
     return () => {
-      window.removeEventListener("concept-completed", onConceptCompleted);
+      window.removeEventListener('concept-completed', onConceptCompleted);
+      window.removeEventListener('navigate-to-tab', handleNavigate);
     };
   }, []);
 
-  const renderOverview = () => (
-    <div className="student-overview">
-      <div className="stats-grid">
-        <div className="stat-card">
-          <div className="stat-icon primary">📝</div>
-          <div className="stat-value">{studentStats.totalQuizzes}</div>
-          <div className="stat-label">Quizzes Taken</div>
+  const renderOverview = () => {
+    const progress = [
+      { label: 'Acids & Bases', value: 75 },
+      { label: 'Periodic Table', value: 60 },
+      { label: 'Chemical Bonding', value: 40 },
+      { label: 'Thermodynamics', value: 20 },
+    ];
+
+    return (
+      <div className="student-home">
+        <div className="student-hero">
+          <div>
+            <div className="student-hero-greeting">Welcome back, {userName}!</div>
+            <div className="student-hero-subtitle">Ready to explore chemistry today?</div>
+          </div>
+          <button
+            className="upgrade-btn"
+            onClick={() => setActiveTab('subscription')}
+          >
+            Upgrade Plan
+          </button>
         </div>
 
-        <div className="stat-card">
-          <div className="stat-icon success">✅</div>
-          <div className="stat-value">{studentStats.accuracy}%</div>
-          <div className="stat-label">Accuracy Rate</div>
-        </div>
-
-        <div className="stat-card">
-          <div className="stat-icon warning">🧪</div>
-          <div className="stat-value">{studentStats.conceptsLearned}</div>
-          <div className="stat-label">Concepts Learned</div>
-        </div>
-
-        <div className="stat-card">
-          <div className="stat-icon danger">🔥</div>
-          <div className="stat-value">{studentStats.currentStreak}</div>
-          <div className="stat-label">Day Streak</div>
-        </div>
-      </div>
-
-      <div className="dashboard-grid">
-        <div className="dashboard-card">
-          <h3>Recent Activity</h3>
-          <div className="activity-list">
-            {recentActivity.map((activity) => (
-              <div key={activity.id} className="activity-item">
-                <div className="activity-icon">
-                  {activity.type === "quiz" && "📝"}
-                  {activity.type === "concept" && "🧪"}
-                  {activity.type === "remediation" && "🔧"}
+        <div className="learning-progress-card">
+          <div className="lp-header">
+            <div className="lp-title">Learning Progress</div>
+            <div className="lp-subtitle">Your progress across different chemistry concepts</div>
+          </div>
+          <div className="lp-tracks">
+            {progress.map((item) => (
+              <div key={item.label} className="lp-row">
+                <div className="lp-row-header">
+                  <span className="lp-row-label">{item.label}</span>
+                  <span className="lp-row-value">{item.value}%</span>
                 </div>
-                <div className="activity-content">
-                  <div className="activity-title">{activity.title}</div>
-                  <div className="activity-meta">
-                    {activity.score && (
-                      <span className="score">Score: {activity.score}%</span>
-                    )}
-                    {activity.status && (
-                      <span className="status">{activity.status}</span>
-                    )}
-                    <span className="date">{activity.date}</span>
-                  </div>
+                <div className="lp-bar">
+                  <div className="lp-bar-fill" style={{ width: `${item.value}%` }} />
                 </div>
+                <button
+                  className="lp-cta"
+                  onClick={() => setActiveTab('concepts')}
+                >
+                  Continue
+                </button>
               </div>
             ))}
           </div>
         </div>
 
-        <div className="dashboard-card">
-          <h3>Quick Actions</h3>
-          <div className="quick-actions">
-            <button
-              className="btn btn-primary"
-              onClick={() => setActiveTab("quizzes")}
-            >
-              📝 Take a Quiz
-            </button>
-            <button
-              className="btn btn-secondary"
-              onClick={() => setActiveTab("concepts")}
-            >
-              🧪 Study Concepts
-            </button>
-            <button
-              className="btn btn-secondary"
-              onClick={() => setActiveTab("concept-map")}
-            >
-              🗺️ View Concept Map
-            </button>
-            <button
-              className="btn btn-secondary"
-              onClick={() => setActiveTab("molecule-animation")}
-            >
-              🔬 Molecule Animation
-            </button>
-            <button
-              className="btn btn-secondary"
-              onClick={() => setActiveTab("remediation")}
-            >
-              🔧 Remediation
-            </button>
+        <div className="student-feature-grid">
+          <button className="feature-card" onClick={() => setActiveTab('concepts')}>
+            <div className="feature-icon blue">📘</div>
+            <div className="feature-title">Study Notes</div>
+            <div className="feature-sub">Access comprehensive chemistry concepts</div>
+          </button>
+          <button className="feature-card" onClick={() => setActiveTab('concept-map')}>
+            <div className="feature-icon green">🧠</div>
+            <div className="feature-title">Concept Mapping</div>
+            <div className="feature-sub">Build connections between topics</div>
+          </button>
+          <button className="feature-card" onClick={() => setActiveTab('knowledge-graph')}>
+            <div className="feature-icon teal">🗺️</div>
+            <div className="feature-title">Knowledge Graph</div>
+            <div className="feature-sub">Visualize concept relationships</div>
+          </button>
+          <button className="feature-card" onClick={() => setActiveTab('quizzes')}>
+            <div className="feature-icon purple">🧪</div>
+            <div className="feature-title">Take Quiz</div>
+            <div className="feature-sub">Test your understanding</div>
+          </button>
+          <button className="feature-card" onClick={() => setActiveTab('learning-path')}>
+            <div className="feature-icon red">🛣️</div>
+            <div className="feature-title">Learning Path</div>
+            <div className="feature-sub">AI-generated roadmap for you</div>
+          </button>
+          <button className="feature-card" onClick={() => setActiveTab('performance-dashboard')}>
+            <div className="feature-icon orange">📈</div>
+            <div className="feature-title">Performance</div>
+            <div className="feature-sub">Track your progress</div>
+          </button>
+          <button className="feature-card" onClick={() => setActiveTab('gamification')}>
+            <div className="feature-icon gold">🏆</div>
+            <div className="feature-title">Achievements</div>
+            <div className="feature-sub">View badges and leaderboard</div>
+          </button>
+        </div>
+
+        <div className="recent-activity-card">
+          <div className="ra-header">
+            <div>
+              <div className="ra-title">Recent Activity</div>
+              <div className="ra-subtitle">Your latest learning sessions</div>
+            </div>
+          </div>
+          <div className="ra-list">
+            {recentActivity.length > 0 ? (
+              recentActivity.map((activity) => (
+                <div key={activity.id} className="ra-item quiz">
+                  <div className="ra-icon">🧪</div>
+                  <div className="ra-content">
+                    <div className="ra-main">
+                      <div className="ra-label">{activity.title}</div>
+                      <span className="ra-pill success">Passed</span>
+                    </div>
+                    <div className="ra-meta">
+                      <span>Scored {activity.score}%</span>
+                      <span>•</span>
+                      <span>{activity.date}</span>
+                    </div>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <>
+                <div className="ra-item quiz">
+                  <div className="ra-icon">🧪</div>
+                  <div className="ra-content">
+                    <div className="ra-main">
+                      <div className="ra-label">Acids & Bases Quiz</div>
+                      <span className="ra-pill success">Passed</span>
+                    </div>
+                    <div className="ra-meta">
+                      <span>Scored 85%</span>
+                      <span>•</span>
+                      <span>2 hours ago</span>
+                    </div>
+                  </div>
+                </div>
+                <div className="ra-item study">
+                  <div className="ra-icon">📗</div>
+                  <div className="ra-content">
+                    <div className="ra-main">
+                      <div className="ra-label">Chemical Bonding Notes</div>
+                      <span className="ra-pill neutral">Completed</span>
+                    </div>
+                    <div className="ra-meta">
+                      <span>Studied for 45 minutes</span>
+                      <span>•</span>
+                      <span>Yesterday</span>
+                    </div>
+                  </div>
+                </div>
+                <div className="ra-item mapping">
+                  <div className="ra-icon">🗺️</div>
+                  <div className="ra-content">
+                    <div className="ra-main">
+                      <div className="ra-label">Concept Map Created</div>
+                      <span className="ra-pill neutral">Saved</span>
+                    </div>
+                    <div className="ra-meta">
+                      <span>Periodic trends mapping</span>
+                      <span>•</span>
+                      <span>3 days ago</span>
+                    </div>
+                  </div>
+                </div>
+              </>
+            )}
           </div>
         </div>
       </div>
-
-      <div className="dashboard-card">
-        <h3>Learning Progress</h3>
-        <div className="progress-overview">
-          <div className="progress-item">
-            <div className="progress-label">Overall Progress</div>
-            <div className="progress-bar">
-              <div className="progress-fill" style={{ width: "75%" }}></div>
-            </div>
-            <div className="progress-value">75%</div>
-          </div>
-
-          <div className="progress-item">
-            <div className="progress-label">This Week</div>
-            <div className="progress-bar">
-              <div className="progress-fill" style={{ width: "60%" }}></div>
-            </div>
-            <div className="progress-value">60%</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
+    );
+  };
 
   const renderContent = () => {
     switch (activeTab) {
-      case "overview":
+      case 'overview':
         return renderOverview();
-      case "concepts":
-        return <ConceptPages />;
-      case "quizzes":
+      case 'concepts':
+        return <ConceptPages initialTopic={selectedLearningTopic} />;
+      case 'quizzes':
         return <QuizEngine />;
-      case "concept-map":
+      case 'concept-map':
         return <ConceptMap role="student" />;
-      case "progress":
+      case 'knowledge-graph':
+        return <KnowledgeGraphVisualizer />;
+      case 'progress':
         return <ProgressTracker />;
-      case "remediation":
+      case 'learning-path':
+        return (
+          <LearningPath
+            onStartTopic={(topic) => {
+              setSelectedLearningTopic(topic);
+              setActiveTab('concepts');
+            }}
+          />
+        );
+      case 'remediation':
         return <RemediationModule />;
-      case "confidence":
+      case 'confidence':
         return <ConfidenceMeter />;
-      case "molecule-animation":
-        return <MoleculeAnimation />;
-      case "periodic-table":
+      case 'ar-multimedia':
+        return <ARMultimediaModule />;
+      case 'molecule-animation':
+        return <ARMultimediaModule />;
+      case 'periodic-table':
         return <PeriodicTable />;
-      case "chemical-equations":
+      case 'chemical-equations':
         return <ChemicalEquations />;
-      case "chemistry-calculator":
+      case 'chemistry-calculator':
         return <ChemistryCalculator />;
-      case "leaderboard":
-        return <Leaderboard />;
-      case "performance-dashboard":
+      case 'gamification':
+        return <GamifiedTracker />;
+      case 'performance-dashboard':
         return <PerformanceDashboard />;
+      case 'subscription':
+        return <SubscriptionPage user={{ role: 'student' }} />;
       default:
         return renderOverview();
     }
@@ -255,18 +329,9 @@ const StudentDashboard = ({ activeTab, setActiveTab }) => {
 
   return (
     <div className="student-dashboard-layout">
-      <div
-        className="student-dashboard-header"
-        style={{ padding: "24px 0 0 0" }}
-      >
-        <h2 style={{ fontWeight: 600, color: "#1976d2" }}>
-          Good Evening, {userName}!
-        </h2>
-        <p style={{ color: "#555", fontSize: 16 }}>
-          Ready to explore chemistry concepts?
-        </p>
+      <div className="student-dashboard-content">
+        {renderContent()}
       </div>
-      <div className="student-dashboard-content">{renderContent()}</div>
     </div>
   );
 };

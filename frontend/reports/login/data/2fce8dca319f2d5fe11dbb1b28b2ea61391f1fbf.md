@@ -1,0 +1,42 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e2]:
+  - region "Notifications Alt+T"
+  - generic [ref=e4]:
+    - generic [ref=e5]:
+      - img "colorful-chemistry-logo" [ref=e6]
+      - heading "ChemConcept Bridge" [level=2] [ref=e7]
+      - paragraph [ref=e8]: Join our community of chemistry learners
+    - generic [ref=e9]:
+      - generic [ref=e10]:
+        - generic [ref=e11]: Full Name
+        - textbox "Full Name" [ref=e12]:
+          - /placeholder: Enter your full name
+      - generic [ref=e13]:
+        - generic [ref=e14]: Email Address
+        - textbox "Email Address" [ref=e15]:
+          - /placeholder: Enter your email address
+          - text: test@test.com
+      - generic [ref=e16]:
+        - generic [ref=e17]: Password
+        - textbox "Password" [ref=e18]:
+          - /placeholder: Create a secure password
+          - text: password123
+        - paragraph [ref=e19]: Password must contain at least one uppercase letter
+      - generic [ref=e20]:
+        - generic [ref=e21]: Confirm Password
+        - textbox "Confirm Password" [ref=e22]:
+          - /placeholder: Re-enter your password
+          - text: differentpassword
+        - paragraph [ref=e23]: Passwords do not match
+      - button "Create Account" [active] [ref=e24] [cursor=pointer]
+      - generic [ref=e25]: OR
+      - generic [ref=e26]:
+        - paragraph [ref=e27]:
+          - text: Already have an account?
+          - link "Sign In" [ref=e28] [cursor=pointer]:
+            - /url: /login
+        - link "Need help creating a secure password?" [ref=e29] [cursor=pointer]:
+          - /url: /generate-password
+```

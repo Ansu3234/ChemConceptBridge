@@ -95,6 +95,51 @@ const RULES = [
       { type: 'simulation', title: 'Thermodynamics Simulator', url: 'https://phet.colorado.edu/sims/html/energy-forms-and-changes/latest/energy-forms-and-changes_en.html' },
       { type: 'video', title: 'Understanding Energy Changes', url: 'https://www.youtube.com/watch?v=5Y2X1jRAon0' }
     ]
+  },
+  // Atomic Structure Misconceptions
+  {
+    category: 'atomic-structure',
+    patterns: [
+      /electrons.*nucleus|protons.*orbiting/i,
+      /neutrons.*charge|electrons.*positive|protons.*negative/i,
+      /mass\s*number.*atomic\s*number.*same/i
+    ],
+    misconception: 'Misunderstanding atomic subatomic particles and their positions',
+    severity: 'high',
+    resources: [
+      { type: 'interactive', title: 'Build an Atom', url: 'https://phet.colorado.edu/sims/html/build-an-atom/latest/build-an-atom_en.html' },
+      { type: 'video', title: 'Atomic Structure Explained', url: 'https://www.youtube.com/watch?v=lP57gEWcisY' }
+    ]
+  },
+  // Chemical Equilibrium Misconceptions
+  {
+    category: 'equilibrium',
+    patterns: [
+      /equilibrium.*static|reaction.*stops.*equilibrium/i,
+      /concentration.*equal.*equilibrium/i,
+      /catalyst.*shifts.*equilibrium/i
+    ],
+    misconception: 'Misunderstanding the dynamic nature of chemical equilibrium',
+    severity: 'high',
+    resources: [
+      { type: 'animation', title: 'Reversible Reactions', url: 'https://phet.colorado.edu/sims/html/reversible-reactions/latest/reversible-reactions_en.html' },
+      { type: 'video', title: 'Dynamic Equilibrium Basics', url: 'https://www.youtube.com/watch?v=wlD_ImYQAgQ' }
+    ]
+  },
+  // Solubility Misconceptions
+  {
+    category: 'solubility',
+    patterns: [
+      /saturated.*cannot\s*dissolve.*more|supersaturated.*stable/i,
+      /solubility.*increases.*temp.*always/i,
+      /dissolving.*chemical\s*change/i
+    ],
+    misconception: 'Confusing physical dissolution with chemical reactions or saturation states',
+    severity: 'medium',
+    resources: [
+      { type: 'simulation', title: 'Salts and Solubility', url: 'https://phet.colorado.edu/sims/html/salts-and-solubility/latest/salts-and-solubility_en.html' },
+      { type: 'video', title: 'Solubility and Saturation', url: 'https://www.youtube.com/watch?v=OpW_93uToi0' }
+    ]
   }
 ];
 
@@ -139,7 +184,8 @@ router.post('/recommend', auth, async (req, res) => {
     const { attemptId } = req.body || {};
     if (!attemptId) return res.status(400).json({ message: 'attemptId is required' });
 
-    const attempt = await QuizAttempt.findById(attemptId).populate('quiz', 'topic');
+    // Populate quiz with full questions so we can access option text and question context
+    const attempt = await QuizAttempt.findById(attemptId).populate('quiz');
     if (!attempt || attempt.student.toString() !== req.user.id) {
       return res.status(404).json({ message: 'Attempt not found' });
     }
@@ -149,39 +195,61 @@ router.post('/recommend', auth, async (req, res) => {
 
     // Enhanced misconception detection from user answers
     attempt.answers.forEach(answer => {
-      // Combine answer text with question context for better detection
-      const answerText = String(answer.selectedOption || '');
-      const context = attempt.quiz?.topic || '';
+      // Try to resolve the selected option text and question context for better detection
+      let answerText = '';
+      let context = attempt.quiz?.topic || '';
+      try {
+        const questionObj = (attempt.quiz && Array.isArray(attempt.quiz.questions))
+          ? attempt.quiz.questions.find(q => String(q._id) === String(answer.questionId))
+          : null;
+        if (questionObj) {
+          answerText = String(questionObj.options?.[answer.selectedOption] || '');
+          context = questionObj.question || context;
+        } else {
+          answerText = String(answer.selectedOption || '');
+        }
+      } catch (e) {
+        answerText = String(answer.selectedOption || '');
+      }
+
       const detected = detectMisconceptions(answerText, context);
+      // Debug log to help trace mapping of selected option -> detected misconceptions
+      console.debug('[remediation] questionId=', String(answer.questionId), 'selectedIndex=', String(answer.selectedOption), 'answerText=', answerText, 'context=', context, 'detected=', detected.map(d=>d.misconception || d));
       detectedMisconceptions.push(...detected);
     });
 
-    // Combine with existing misconceptions
-    const allMisconceptions = [...misconceptions, ...detectedMisconceptions];
+  // Combine with existing misconceptions
+  const allMisconceptions = [...misconceptions, ...detectedMisconceptions];
 
     // Rule-based recommendations with enhanced categorization
     const recs = [];
     allMisconceptions.forEach(m => {
-      const misconceptionText = typeof m === 'string' ? m : m.misconception;
+      const text = String(typeof m === 'string' ? m : m.misconception || '').toLowerCase();
       RULES.forEach(rule => {
-        rule.patterns.forEach(pattern => {
-          if (pattern.test(misconceptionText)) {
-            rule.resources.forEach(r => recs.push({ 
-              reason: misconceptionText,
-              category: rule.category,
-              severity: rule.severity,
-              confidence: typeof m === 'object' ? m.confidence : 0.8,
-              ...r 
-            }));
-          }
-        });
+        const ruleText = String(rule.misconception || '').toLowerCase();
+        const match = (ruleText === text) || text.includes(ruleText) || ruleText.includes(text);
+        if (match) {
+          rule.resources.forEach(r => recs.push({
+            reason: typeof m === 'string' ? m : m.misconception,
+            category: rule.category,
+            severity: rule.severity,
+            confidence: typeof m === 'object' ? m.confidence : 0.8,
+            ...r
+          }));
+        }
       });
     });
 
     // Concept-based fallback: find concepts by topic
     if (attempt.quiz?.topic) {
-      const concepts = await Concept.find({ topic: attempt.quiz.topic, status: 'approved', isActive: true })
-        .select('title content.visualizations content.interactiveElements');
+      const concepts = await Concept.find({
+        isActive: true,
+        status: 'approved',
+        $or: [
+          { topic: { $regex: attempt.quiz.topic, $options: 'i' } },
+          { tags: { $in: [attempt.quiz.topic] } }
+        ]
+      }).select('title content.visualizations content.interactiveElements');
       concepts.slice(0, 3).forEach(c => {
         (c.content?.visualizations || []).forEach(u => recs.push({ 
           type: 'visualization', 
@@ -198,6 +266,57 @@ router.post('/recommend', auth, async (req, res) => {
           severity: 'low'
         }));
       });
+    }
+
+    if (recs.length === 0) {
+      const text = ([attempt.quiz?.topic || '']
+        .concat((attempt.quiz?.questions || []).map(q => q.question || ''))
+        .concat(allMisconceptions.map(m => (typeof m === 'string' ? m : m.misconception) || ''))
+        .join(' ').toLowerCase());
+
+      const addRuleResources = (category) => {
+        const rule = RULES.find(r => r.category === category);
+        if (rule) {
+          rule.resources.forEach(r => recs.push({
+            reason: rule.misconception,
+            category: rule.category,
+            severity: rule.severity,
+            confidence: 0.6,
+            ...r
+          }));
+        }
+      };
+
+      if (/(naoh|koh|acid|base|ph)/.test(text)) addRuleResources('acid-base');
+      else if (/(mole|moles|stoichiometry|limiting|reagent|mass)/.test(text)) addRuleResources('stoichiometry');
+      else if (/(bond|ionic|covalent|metallic|polarity)/.test(text)) addRuleResources('bonding');
+      else if (/(thermo|entropy|enthalpy|exothermic|endothermic|gibbs)/.test(text)) addRuleResources('thermodynamics');
+      else if (/(periodic|group|alkali|alkaline|noble|metal)/.test(text)) addRuleResources('periodic-table');
+    }
+
+    if (recs.length === 0) {
+      const topic = String(attempt.quiz?.topic || '').toLowerCase();
+      const mapTopic = (t) => {
+        if (/acid/.test(t) || /base/.test(t)) return 'acid-base';
+        if (/stoich/.test(t)) return 'stoichiometry';
+        if (/bond/.test(t)) return 'bonding';
+        if (/thermo/.test(t)) return 'thermodynamics';
+        if (/periodic/.test(t)) return 'periodic-table';
+        return null;
+      };
+      const cat = mapTopic(topic);
+      if (cat) {
+        const rule = RULES.find(r => r.category === cat);
+        if (rule) {
+          rule.resources.forEach(r => recs.push({
+            reason: rule.misconception,
+            category: rule.category,
+            severity: rule.severity,
+            confidence: 0.5,
+            ...r
+          }));
+        }
+      }
     }
 
     // De-duplicate by url and sort by severity

@@ -4,6 +4,7 @@ import api from '../../apiClient';
 import { Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import ContentManagement from './ContentManagement';
+import SubscriptionPage from '../../pages/SubscriptionPage';
 
 // Simple list and create UI for quizzes and concepts + Students tab aggregated from quiz stats
 const TeacherDashboard = ({ activeTab, setActiveTab, user }) => {
@@ -835,6 +836,8 @@ const TeacherDashboard = ({ activeTab, setActiveTab, user }) => {
         );
       case 'content':
         return <ContentManagement user={user} />;
+      case 'subscription':
+        return <SubscriptionPage user={{ role: 'teacher' }} />;
       default:
         return renderOverview();
     }

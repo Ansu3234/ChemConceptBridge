@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import "./LoginPage.css";
 import { Link, useNavigate } from "react-router-dom";
-import axios from "axios";
-import { signInWithPopup, GoogleAuthProvider } from "firebase/auth";
+import api from "../apiClient";
+import { signInWithPopup, signInWithRedirect, getRedirectResult, GoogleAuthProvider } from "firebase/auth";
 import { auth } from "../firebase";
 
 function LoginPage() {
@@ -14,9 +14,28 @@ function LoginPage() {
   const [rememberMe, setRememberMe] = useState(false);
 
   // 🌐 Use Render backend when deployed, localhost otherwise
-  const API_BASE_URL =
-    process.env.REACT_APP_API_BASE_URL ||
-    "https://backend-project-1-sjrn.onrender.com/api";
+  // API base handled by shared api client (local dev defaults to http://localhost:10000/api)
+  // Handle redirect-based Google auth results (fallback for popup issues/COP)
+  React.useEffect(() => {
+    const consumeRedirectResult = async () => {
+      try {
+        const result = await getRedirectResult(auth);
+        if (!result) return;
+        const credential = GoogleAuthProvider.credentialFromResult(result);
+        const tokenId = credential?.idToken;
+        if (!tokenId) return;
+        const { data } = await api.post(`/auth/google-login`, { tokenId });
+        localStorage.setItem("token", data.token);
+        localStorage.setItem("userName", data.user.name);
+        localStorage.setItem("userRole", data.user.role);
+        const next = data.user.role === "admin" ? "/admin-dashboard" : data.user.role === "teacher" ? "/teacher-dashboard" : "/student-dashboard";
+        navigate(next);
+      } catch (e) {
+        // Silent: user may have cancelled
+      }
+    };
+    consumeRedirectResult();
+  }, [navigate]);
 
   // Email validation
   const validateEmail = (value) => {
@@ -50,7 +69,7 @@ function LoginPage() {
 
     setLoading(true);
     try {
-      const { data } = await axios.post(`${API_BASE_URL}/auth/login`, {
+      const { data } = await api.post(`/auth/login`, {
         email,
         password,
         rememberMe,
@@ -70,12 +89,19 @@ function LoginPage() {
       navigate(next);
     } catch (err) {
       console.error("Login error:", err);
-      setError(
-        err.response?.data?.message ||
-          (err.message === "Network Error"
-            ? "Network error. Check your internet connection."
-            : "Login failed. Please try again.")
-      );
+      let errorMessage = "Login failed. Please try again.";
+      
+      if (err.message === "Network Error" || err.code === "ERR_NETWORK" || err.code === "ECONNREFUSED") {
+        errorMessage = "Cannot connect to server. Please ensure the backend server is running on http://localhost:10000";
+      } else if (err.response?.data?.message) {
+        errorMessage = err.response.data.message;
+      } else if (err.response?.status === 404) {
+        errorMessage = "Server endpoint not found. Please check backend configuration.";
+      } else if (err.response?.status === 500) {
+        errorMessage = "Server error. Please try again later.";
+      }
+      
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -98,7 +124,7 @@ function LoginPage() {
       if (!tokenId) throw new Error("Failed to retrieve Google token");
 
       // Send token to backend for verification
-      const { data } = await axios.post(`${API_BASE_URL}/auth/google-login`, {
+      const { data } = await api.post(`/auth/google-login`, {
         tokenId,
       });
 
@@ -116,15 +142,21 @@ function LoginPage() {
       navigate(next);
     } catch (err) {
       console.error("Google login error:", err);
-
-      if (err.code === "auth/popup-closed-by-user") {
-        setError("Google login was cancelled.");
-      } else if (err.code === "auth/popup-blocked") {
-        setError("Popup blocked. Allow popups for this site.");
-      } else if (err.code === "auth/unauthorized-domain") {
-        setError("Unauthorized domain. Add this site in Firebase console.");
-      } else {
-        setError("Google login failed. Please try again.");
+      // Fallback to redirect flow for environments with COOP/popup restrictions
+      try {
+        const provider = new GoogleAuthProvider();
+        await signInWithRedirect(auth, provider);
+        return;
+      } catch (redirectErr) {
+        if (err.code === "auth/popup-closed-by-user") {
+          setError("Google login was cancelled.");
+        } else if (err.code === "auth/popup-blocked") {
+          setError("Popup blocked. Allow popups for this site.");
+        } else if (err.code === "auth/unauthorized-domain") {
+          setError("Unauthorized domain. Add this site in Firebase console.");
+        } else {
+          setError("Google login failed. Please try again.");
+        }
       }
     } finally {
       setLoading(false);

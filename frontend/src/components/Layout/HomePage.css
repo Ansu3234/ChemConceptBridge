@@ -1,0 +1,15 @@
+/* Layout/HomePage.css - small shim to reuse page styles where Navbar expects HomePage.css */
+@import '../../pages/HomePage.css';
+
+/* Additional small overrides for navbar area */
+.home-header {
+  background: transparent;
+}
+
+.home-header.scrolled {
+  background: #ffffff;
+}
+
+.header-nav .nav-link {
+  color: #333;
+}

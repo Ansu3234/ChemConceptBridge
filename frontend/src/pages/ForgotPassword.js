@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import axios from 'axios';
+import api from '../apiClient';
 import './LoginPage.css';
 
 function ForgotPassword() {
@@ -29,10 +29,10 @@ function ForgotPassword() {
     setLoading(true);
     
     // Use the same API base URL pattern as LoginPage
-    const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:5000/api';
+    const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:10000/api';
     
     try {
-      const response = await axios.post(`${API_BASE_URL}/auth/forgot-password`, { email });
+      const response = await api.post(`/auth/forgot-password`, { email });
       setMessage(response.data.message || 'Password reset email sent! Check your inbox for reset instructions.');
     } catch (err) {
       // Provide more specific error messages based on error type

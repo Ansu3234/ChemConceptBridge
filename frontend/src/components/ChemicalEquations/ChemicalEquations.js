@@ -113,6 +113,58 @@ const ChemicalEquations = () => {
         <p>Practice balancing chemical equations and master stoichiometry</p>
       </div>
 
+      <div className="ce-tutorial-section">
+        <div className="tutorial-card">
+          <h3>📘 Mastering Chemical Balancing</h3>
+          <div className="tutorial-content">
+            <p className="intro-text">Balancing ensures that the same number of atoms exist on both the <strong>Reactants</strong> (left) and <strong>Products</strong> (right) sides.</p>
+            
+            <div className="tutorial-steps">
+              <div className="step-box">
+                <span className="step-tag">Step 1</span>
+                <p>Identify unbalanced atoms. In <code>H₂ + O₂ → H₂O</code>, Oxygen is unbalanced (2 on left, 1 on right).</p>
+              </div>
+              <div className="step-box">
+                <span className="step-tag">Step 2</span>
+                <p>Add <strong>coefficients</strong> (the big numbers in front). Never change subscripts (the small numbers).</p>
+              </div>
+              <div className="step-box">
+                <span className="step-tag">Step 3</span>
+                <p>Recount until all atoms match. <code>2H₂ + O₂ → 2H₂O</code> is now balanced!</p>
+              </div>
+            </div>
+
+            <div className="balance-comparison">
+              <h4>Atom Balance Table (Balanced State):</h4>
+              <table className="atom-table">
+                <thead>
+                  <tr>
+                    <th>Element</th>
+                    <th>Reactants (Left)</th>
+                    <th>Products (Right)</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Hydrogen (H)</td>
+                    <td>2 × 2 = <strong>4</strong></td>
+                    <td>2 × 2 = <strong>4</strong></td>
+                    <td>✅ Balanced</td>
+                  </tr>
+                  <tr>
+                    <td>Oxygen (O)</td>
+                    <td>1 × 2 = <strong>2</strong></td>
+                    <td>2 × 1 = <strong>2</strong></td>
+                    <td>✅ Balanced</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {error && <div className="error">{error}</div>}
 
       <div className="ce-content">
@@ -151,9 +203,6 @@ const ChemicalEquations = () => {
               <div className="equation-to-balance">
                 <div className="original-equation">
                   <strong>Original:</strong> {selectedEquation.equationString}
-                </div>
-                <div className="balanced-equation">
-                  <strong>Balanced:</strong> {selectedEquation.balancedEquationString}
                 </div>
               </div>
 

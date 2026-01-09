@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import axios from "axios";
+import api from "../apiClient";
 import "./LoginPage.css";
 
 function ResetPassword() {
@@ -39,11 +39,11 @@ function ResetPassword() {
     setLoading(true);
     
     // Use the same API base URL pattern
-    const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:5000/api';
+    const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:10000/api';
 
     try {
-      const res = await axios.post(
-        `${API_BASE_URL}/auth/reset-password/${token}`,
+      const res = await api.post(
+        `/auth/reset-password/${token}`,
         { password }
       );
       setMessage(res.data.message || "Password reset successful! Redirecting to login...");

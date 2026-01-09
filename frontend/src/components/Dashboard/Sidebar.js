@@ -1,5 +1,6 @@
 import React from 'react';
 import './Sidebar.css';
+import { useNavigate } from 'react-router-dom';
 
 const Sidebar = ({ user, activeTab, setActiveTab, onLogout }) => {
   const getMenuItems = () => {
@@ -8,24 +9,28 @@ const Sidebar = ({ user, activeTab, setActiveTab, onLogout }) => {
       { id: 'concepts', label: 'Concepts', icon: '🧪' },
       { id: 'quizzes', label: 'Quizzes', icon: '📝' },
       { id: 'progress', label: 'Progress', icon: '📈' },
+      { id: 'subscription', label: 'Subscription', icon: '💳' },
     ];
 
     if (user.role === 'student') {
       return [
         ...baseItems,
+        { id: 'videos', label: 'Videos', icon: '🎬' },
+        { id: 'ar-multimedia', label: 'AR & Multimedia', icon: '🎨' },
+        { id: 'learning-path', label: 'Learning Path', icon: '📚' },
         { id: 'concept-map', label: 'Concept Map', icon: '🗺️' },
         { id: 'remediation', label: 'Remediation', icon: '🔧' },
         { id: 'confidence', label: 'Confidence Meter', icon: '📏' },
-        { id: 'molecule-animation', label: 'Molecule Animation', icon: '⚛️' },
         { id: 'chemistry-calculator', label: 'Chemistry Calculator', icon: '🧮' },
         { id: 'periodic-table', label: 'Periodic Table', icon: '📅' },
         { id: 'chemical-equations', label: 'Chemical Equations', icon: '⚗️' },
-        { id: 'leaderboard', label: 'Leaderboard', icon: '🏆' },
+        { id: 'gamification', label: 'Achievements', icon: '🏆' },
         { id: 'performance-dashboard', label: 'Performance', icon: '📊' },
       ];
     } else if (user.role === 'teacher') {
       return [
         ...baseItems,
+        { id: 'videos', label: 'Videos', icon: '🎬' },
         { id: 'students', label: 'Students', icon: '👥' },
         { id: 'analytics', label: 'Analytics', icon: '📊' },
         { id: 'content', label: 'Content Management', icon: '📚' },
@@ -35,12 +40,13 @@ const Sidebar = ({ user, activeTab, setActiveTab, onLogout }) => {
         { id: 'molecule-animation', label: 'Molecule Animation', icon: '⚛️' },
         { id: 'chemistry-calculator', label: 'Chemistry Calculator', icon: '🧮' },
         { id: 'chemical-equations', label: 'Chemical Equations', icon: '⚗️' },
-        { id: 'leaderboard', label: 'Leaderboard', icon: '🏆' },
+        { id: 'gamification', label: 'Leaderboard', icon: '🏆' },
         { id: 'performance-dashboard', label: 'Performance', icon: '📊' },
       ];
     } else if (user.role === 'admin') {
       return [
         ...baseItems,
+        { id: 'videos', label: 'Videos', icon: '🎬' },
         { id: 'users', label: 'User Management', icon: '👥' },
         { id: 'analytics', label: 'Analytics', icon: '📊' },
         { id: 'misconceptions', label: 'Misconception Analytics', icon: '🧠' },
@@ -54,6 +60,7 @@ const Sidebar = ({ user, activeTab, setActiveTab, onLogout }) => {
     return baseItems;
   };
 
+  const navigate = useNavigate();
   const menuItems = getMenuItems();
 
   return (
@@ -81,7 +88,13 @@ const Sidebar = ({ user, activeTab, setActiveTab, onLogout }) => {
             <button
               key={item.id}
               className={`nav-item ${activeTab === item.id ? 'active' : ''}`}
-              onClick={() => setActiveTab(item.id)}
+              onClick={() => {
+                if (item.id === 'videos') {
+                  navigate('/videos');
+                } else {
+                  setActiveTab(item.id);
+                }
+              }}
             >
               <span className="nav-icon">{item.icon}</span>
               <span className="nav-label">{item.label}</span>
